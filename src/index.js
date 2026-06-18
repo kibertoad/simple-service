@@ -3,7 +3,7 @@ const createApp = require("./app");
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
 
-const app = createApp();
+const { app } = createApp();
 
 const server = app.listen(PORT, HOST, () => {
   console.log(`Server listening on http://${HOST}:${PORT}`);
