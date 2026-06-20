@@ -1,0 +1,7 @@
+{
+  "type": "service",
+  "name": "unknown",
+  "summary": "Top-level service",
+  "references": [],
+  "modules": []
+}

@@ -1,0 +1,66 @@
+{
+  "service": "OpenTelemetry Integration Service",
+  "summary": "Unified prescriptive requirements for OpenTelemetry instrumentation and distributed tracing",
+  "groups": [
+    {
+      "name": "OpenTelemetry Instrumentation",
+      "summary": "Request instrumentation and distributed tracing capabilities",
+      "requirements": [
+        {
+          "id": "RT001",
+          "title": "Install OpenTelemetry Dependencies",
+          "statement": "The system SHALL install required OpenTelemetry libraries",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_dbdad2b2007c"
+          ],
+          "acceptance": [
+            {
+              "id": "AC001",
+              "given": "The application is being deployed",
+              "when": "OpenTelemetry dependencies are installed",
+              "outcome": "Required packages (opentelemetry-sdk, opentelemetry-exporter-otlp) are present in package.json"
+            }
+          ]
+        },
+        {
+          "id": "RT002",
+          "title": "Configure OpenTelemetry SDK",
+          "statement": "The system SHALL initialize OpenTelemetry with default configurations",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_dbdad2b2007c"
+          ],
+          "acceptance": [
+            {
+              "id": "AC002",
+              "given": "Application starts",
+              "when": "OpenTelemetry is initialized",
+              "outcome": "SDK is configured with default settings and service name"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RL001",
+      "rule": "All traces must include request context",
+      "rationale": "To enable proper distributed tracing",
+      "sourceBlockIds": [
+        "task_dbdad2b2007c"
+      ]
+    },
+    {
+      "id": "RL002",
+      "rule": "Traces must be exported to OTLP endpoint",
+      "rationale": "To ensure observability across services",
+      "sourceBlockIds": [
+        "task_dbdad2b2007c"
+      ]
+    }
+  ]
+}
