@@ -1,0 +1,31 @@
+{
+  "type": "service",
+  "name": "blueprint-jkXO3v",
+  "summary": "Scaffolded repository blueprint",
+  "references": [
+    "/tmp/blueprint-jkXO3v"
+  ],
+  "modules": [
+    {
+      "name": "src",
+      "summary": "Source code directory",
+      "references": [
+        "/tmp/blueprint-jkXO3v/src/"
+      ]
+    },
+    {
+      "name": "docs",
+      "summary": "Documentation",
+      "references": [
+        "/tmp/blueprint-jkXO3v/README.md"
+      ]
+    },
+    {
+      "name": "config",
+      "summary": "Configuration files",
+      "references": [
+        "/tmp/blueprint-jkXO3v/.env"
+      ]
+    }
+  ]
+}
