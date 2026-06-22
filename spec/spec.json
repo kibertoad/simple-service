@@ -1,0 +1,194 @@
+{
+  "service": "User CRUD Service",
+  "summary": "A service implementing CRUD operations for user data with in-memory storage, validation, and minimal functional scope.",
+  "groups": [
+    {
+      "name": "User CRUD Operations",
+      "summary": "Core CRUD functionality for user management",
+      "requirements": [
+        {
+          "id": "req-001",
+          "title": "Create User",
+          "statement": "The system SHALL create a user",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_11f5613309fe"
+          ],
+          "acceptance": [
+            {
+              "id": "acc-001-001",
+              "given": "A user with valid `id`, `name`, and `email` fields",
+              "when": "The create operation is invoked",
+              "outcome": "The user is stored in the in-memory database"
+            },
+            {
+              "id": "acc-001-002",
+              "given": "A user with invalid `email` format",
+              "when": "The create operation is invoked",
+              "outcome": "The operation fails with an error"
+            }
+          ]
+        },
+        {
+          "id": "req-002",
+          "title": "Retrieve User by ID",
+          "statement": "The system SHALL retrieve a user by ID",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_11f5613309fe"
+          ],
+          "acceptance": [
+            {
+              "id": "acc-002-001",
+              "given": "A user exists in the in-memory database with a known `id`",
+              "when": "The read operation is invoked with the `id`",
+              "outcome": "The user’s data is returned"
+            },
+            {
+              "id": "acc-002-002",
+              "given": "A user does not exist in the in-memory database",
+              "when": "The read operation is invoked with a non-existent `id`",
+              "outcome": "The operation fails with an error"
+            }
+          ]
+        },
+        {
+          "id": "req-003",
+          "title": "Update User",
+          "statement": "The system SHALL update a user’s details",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_11f5613309fe"
+          ],
+          "acceptance": [
+            {
+              "id": "acc-003-001",
+              "given": "A user exists in the in-memory database with a known `id`",
+              "when": "An update operation is invoked with new `name` or `email` values",
+              "outcome": "The user’s data is modified in the in-memory database"
+            },
+            {
+              "id": "acc-003-002",
+              "given": "An update attempt with invalid `email` format",
+              "when": "The update operation is invoked",
+              "outcome": "The operation fails with an error"
+            }
+          ]
+        },
+        {
+          "id": "req-004",
+          "title": "Delete User",
+          "statement": "The system SHALL delete a user by ID",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_11f5613309fe"
+          ],
+          "acceptance": [
+            {
+              "id": "acc-004-001",
+              "given": "A user exists in the in-memory database with a known `id`",
+              "when": "The delete operation is invoked with the `id`",
+              "outcome": "The user is removed from the in-memory database"
+            },
+            {
+              "id": "acc-004-002",
+              "given": "A delete attempt for a non-existent `id`",
+              "when": "The delete operation is invoked",
+              "outcome": "The operation fails with an error"
+            }
+          ]
+        },
+        {
+          "id": "req-005",
+          "title": "Email Validation",
+          "statement": "The system SHALL validate email format during creation and update",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_11f5613309fe"
+          ],
+          "acceptance": [
+            {
+              "id": "acc-005-001",
+              "given": "A user attempt to create or update with an invalid `email`",
+              "when": "The operation is invoked",
+              "outcome": "The operation fails with an error"
+            },
+            {
+              "id": "acc-005-002",
+              "given": "A user attempt to create or update with a valid `email`",
+              "when": "The operation is invoked",
+              "outcome": "The operation succeeds"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Non-Functional Requirements",
+      "summary": "Quality attributes and system constraints",
+      "requirements": [
+        {
+          "id": "req-006",
+          "title": "In-Memory Storage",
+          "statement": "The system SHALL use in-memory storage",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_11f5613309fe"
+          ],
+          "acceptance": []
+        },
+        {
+          "id": "req-007",
+          "title": "No Authentication",
+          "statement": "The system SHALL not require authentication",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_11f5613309fe"
+          ],
+          "acceptance": []
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule-001",
+      "rule": "The user data structure SHALL include `id`, `name`, and `email`",
+      "rationale": "Defined by the product owner to ensure consistency",
+      "sourceBlockIds": [
+        "block_11f5613309fe"
+      ]
+    },
+    {
+      "id": "rule-002",
+      "rule": "The email field SHALL adhere to a valid email format",
+      "rationale": "To ensure data integrity and usability",
+      "sourceBlockIds": [
+        "block_11f5613309fe"
+      ]
+    },
+    {
+      "id": "rule-003",
+      "rule": "The system operates in a trusted environment",
+      "rationale": "No authentication is required",
+      "sourceBlockIds": [
+        "block_11f5613309fe"
+      ]
+    },
+    {
+      "id": "rule-004",
+      "rule": "User identification is solely based on `id`",
+      "rationale": "As specified by the product owner",
+      "sourceBlockIds": [
+        "block_11f5613309fe"
+      ]
+    }
+  ]
+}
