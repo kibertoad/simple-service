@@ -1,0 +1,146 @@
+{
+  "service": "User Management Service",
+  "summary": "Provides CRUD operations for user management with in-memory storage",
+  "groups": [
+    {
+      "name": "User Management",
+      "summary": "Core user management operations",
+      "requirements": [
+        {
+          "id": "R001",
+          "title": "Create User",
+          "statement": "The system SHALL create a new user with unique identifier and provided attributes",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_ac782876c255"
+          ],
+          "acceptance": [
+            {
+              "id": "A001",
+              "given": "User data with valid unique ID and required fields",
+              "when": "The create user API is called",
+              "outcome": "User is successfully created and stored in memory"
+            },
+            {
+              "id": "A002",
+              "given": "User data with existing ID",
+              "when": "The create user API is called",
+              "outcome": "Error response indicating duplicate ID is returned"
+            },
+            {
+              "id": "A003",
+              "given": "User data with missing required fields",
+              "when": "The create user API is called",
+              "outcome": "Error response indicating invalid data format is returned"
+            }
+          ]
+        },
+        {
+          "id": "R002",
+          "title": "Read User",
+          "statement": "The system SHALL retrieve user details by ID",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_ac782876c255"
+          ],
+          "acceptance": [
+            {
+              "id": "A004",
+              "given": "Valid user ID",
+              "when": "The read user API is called",
+              "outcome": "User data is returned successfully"
+            },
+            {
+              "id": "A005",
+              "given": "Invalid user ID",
+              "when": "The read user API is called",
+              "outcome": "Error response indicating user not found is returned"
+            }
+          ]
+        },
+        {
+          "id": "R003",
+          "title": "Update User",
+          "statement": "The system SHALL update existing user attributes",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_ac782876c255"
+          ],
+          "acceptance": [
+            {
+              "id": "A006",
+              "given": "Valid user ID and update data",
+              "when": "The update user API is called",
+              "outcome": "User data is successfully updated"
+            },
+            {
+              "id": "A007",
+              "given": "Invalid user ID",
+              "when": "The update user API is called",
+              "outcome": "Error response indicating user not found is returned"
+            },
+            {
+              "id": "A008",
+              "given": "Partial update data",
+              "when": "The update user API is called",
+              "outcome": "Only provided fields are updated while others remain unchanged"
+            }
+          ]
+        },
+        {
+          "id": "R004",
+          "title": "Delete User",
+          "statement": "The system SHALL remove a user by ID",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "block_ac782876c255"
+          ],
+          "acceptance": [
+            {
+              "id": "A009",
+              "given": "Valid user ID",
+              "when": "The delete user API is called",
+              "outcome": "User is successfully removed from storage"
+            },
+            {
+              "id": "A010",
+              "given": "Invalid user ID",
+              "when": "The delete user API is called",
+              "outcome": "Error response indicating user not found is returned"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RU001",
+      "rule": "All user data must be stored in temporary in-memory storage",
+      "rationale": "Implementation requirement for transient data storage",
+      "sourceBlockIds": [
+        "block_ac782876c255"
+      ]
+    },
+    {
+      "id": "RU002",
+      "rule": "User IDs must be unique across all users",
+      "rationale": "Ensures data integrity and proper identification",
+      "sourceBlockIds": [
+        "block_ac782876c255"
+      ]
+    },
+    {
+      "id": "RU003",
+      "rule": "Validation must be performed on all user input data",
+      "rationale": "Prevents invalid or malformed data from being stored",
+      "sourceBlockIds": [
+        "block_ac782876c255"
+      ]
+    }
+  ]
+}

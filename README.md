@@ -36,11 +36,19 @@ PORT=8080 npm start
 
 ## Endpoints
 
-| Method | Path      | Description                          |
-| ------ | --------- | ------------------------------------ |
-| GET    | `/`       | Returns a greeting JSON message.     |
-| GET    | `/health` | Health check endpoint.               |
-| POST   | `/echo`   | Echoes back the JSON body you send.  |
+| Method | Path           | Description                                                           |
+| ------ | -------------- | --------------------------------------------------------------------- |
+| GET    | `/`            | Returns a greeting JSON message.                                      |
+| GET    | `/health`      | Health check endpoint.                                                |
+| POST   | `/echo`        | Echoes back the JSON body you send.                                   |
+| POST   | `/users`       | Create a new user. Returns the created user (no password).            |
+| GET    | `/users`       | List users with pagination (`limit`, `offset`), `role`, and `q`.      |
+| GET    | `/users/:id`   | Get a single user by ID.                                              |
+| PATCH  | `/users/:id`   | Partially update a user.                                              |
+| DELETE | `/users/:id`   | Delete a user by ID.                                                  |
+
+All user data is stored in memory and is lost when the process restarts.
+There is no authentication or authorization on these endpoints.
 
 ## Project structure
 
@@ -48,9 +56,17 @@ PORT=8080 npm start
 .
 ├── package.json
 ├── README.md
-└── src
-    ├── app.js     # Express app factory and routes
-    └── index.js   # Server bootstrap and lifecycle
+├── spec           # Prescriptive requirements
+├── src
+│   ├── app.js               # Express app factory and routes
+│   ├── index.js             # Server bootstrap and lifecycle
+│   └── users
+│       ├── errors.js        # User domain errors
+│       ├── UserService.js   # In-memory user CRUD logic
+│       └── userRoutes.js    # /users Express router
+└── test
+    ├── users.service.test.js  # Unit tests for UserService
+    └── users.routes.test.js   # HTTP tests for /users endpoints
 ```
 
 ## License
