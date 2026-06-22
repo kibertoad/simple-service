@@ -1,0 +1,36 @@
+{
+  "type": "service",
+  "name": "blueprint-SqTj5X",
+  "summary": "A scaffolded repository blueprint",
+  "references": [],
+  "modules": [
+    {
+      "name": "core",
+      "summary": "Core service implementation",
+      "references": [
+        "src/"
+      ]
+    },
+    {
+      "name": "api",
+      "summary": "Public API layer",
+      "references": [
+        "api/"
+      ]
+    },
+    {
+      "name": "config",
+      "summary": "Configuration files",
+      "references": [
+        "config/"
+      ]
+    },
+    {
+      "name": "tests",
+      "summary": "Test suites",
+      "references": [
+        "tests/"
+      ]
+    }
+  ]
+}
