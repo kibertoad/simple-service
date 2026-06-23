@@ -48,3 +48,5 @@
   - _Why:_ Matches the explicit fully ephemeral in-memory store requirement.
 - **Office Table endpoint URLs SHALL NOT contain API version path segments.**
   - _Why:_ The product owner specified no API version prefixes.
+- **An office table is a physical furniture item; the data model and business logic apply to furniture, not database tables or abstract entities.**
+  - _Why:_ Clarifies the domain scope so that the resource is interpreted as office furniture rather than database tables or other abstract constructs.

@@ -151,7 +151,7 @@ Capabilities for typical CRUD operations on Bicycle resources using a transient 
 
 ## Office Table Management
 
-Capabilities for creating, retrieving, listing, updating, and deleting Office Table resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.
+Capabilities for creating, retrieving, listing, updating, and deleting physical office furniture (office table) resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.
 
 - **Office Table CRUD endpoints** _(must, functional)_ — The system SHALL expose REST endpoints for Create, Read, Update, and Delete operations on office table resources; exact URL paths SHALL be determined at implementation time.
   - _Given_ the service is running _When_ its API is inspected _Then_ it exposes RESTful endpoints supporting all CRUD operations for office tables

@@ -892,7 +892,7 @@
     },
     {
       "name": "Office Table Management",
-      "summary": "Capabilities for creating, retrieving, listing, updating, and deleting Office Table resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.",
+      "summary": "Capabilities for creating, retrieving, listing, updating, and deleting physical office furniture (office table) resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.",
       "requirements": [
         {
           "id": "REQ-026",
@@ -1324,6 +1324,14 @@
       "id": "RULE-023",
       "rule": "Office Table endpoint URLs SHALL NOT contain API version path segments.",
       "rationale": "The product owner specified no API version prefixes.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-024",
+      "rule": "An office table is a physical furniture item; the data model and business logic apply to furniture, not database tables or abstract entities.",
+      "rationale": "Clarifies the domain scope so that the resource is interpreted as office furniture rather than database tables or other abstract constructs.",
       "sourceBlockIds": [
         "task_74f863ac61b8"
       ]
