@@ -1,7 +1,7 @@
 {
-  "version": 1,
-  "generatedAt": "2026-06-22T20:31:30.777Z",
-  "hash": "7e875fb0f32edaaadecb3abc4fd7eec35b142a372be91114666d07e7099717d9",
-  "requirements": 6,
-  "rules": 5
+  "version": 2,
+  "generatedAt": "2026-06-23T23:42:13.398Z",
+  "hash": "3e4674f608e9efcf4deb4566ddb203632ca5f341956a035825ce361b684efeee",
+  "requirements": 14,
+  "rules": 12
 }
