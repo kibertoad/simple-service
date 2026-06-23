@@ -2,6 +2,9 @@ const express = require("express");
 const { createUserStore } = require("./store/userStore");
 const { createUserService } = require("./service/userService");
 const { createUsersRouter } = require("./routes/users");
+const { createOrganizationStore } = require("./store/organizationStore");
+const { createOrganizationService } = require("./service/organizationService");
+const { createOrganizationsRouter } = require("./routes/organizations");
 const { DomainError } = require("./domain/errors");
 
 /**
@@ -31,6 +34,11 @@ function createApp() {
   const userStore = createUserStore();
   const userService = createUserService({ store: userStore });
   app.use("/users", createUsersRouter({ userService }));
+
+  // Organization routes
+  const organizationStore = createOrganizationStore();
+  const organizationService = createOrganizationService({ store: organizationStore });
+  app.use("/organizations", createOrganizationsRouter({ organizationService }));
 
   // 404 handler
   app.use((req, res) => {

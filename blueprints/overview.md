@@ -12,14 +12,6 @@ Core service handling application logic and module integration
 
 Core business logic and domain models
 
-### [api](modules/api.md)
+### [infrastructure](modules/infrastructure.md)
 
-Public API interfaces and endpoints
-
-### [ui](modules/ui.md)
-
-User interface components and views
-
-### [utils](modules/utils.md)
-
-Utility functions and shared libraries
+Technical infrastructure and cross-cutting concerns

@@ -15,25 +15,13 @@
       ]
     },
     {
-      "name": "api",
-      "summary": "Public API interfaces and endpoints",
+      "name": "infrastructure",
+      "summary": "Technical infrastructure and cross-cutting concerns",
       "references": [
         "/tmp/blueprint-5ou1BR/src/api/",
-        "/tmp/blueprint-5ou1BR/modules/api/"
-      ]
-    },
-    {
-      "name": "ui",
-      "summary": "User interface components and views",
-      "references": [
+        "/tmp/blueprint-5ou1BR/modules/api/",
         "/tmp/blueprint-5ou1BR/src/ui/",
-        "/tmp/blueprint-5ou1BR/modules/ui/"
-      ]
-    },
-    {
-      "name": "utils",
-      "summary": "Utility functions and shared libraries",
-      "references": [
+        "/tmp/blueprint-5ou1BR/modules/ui/",
         "/tmp/blueprint-5ou1BR/src/utils/",
         "/tmp/blueprint-5ou1BR/modules/utils/"
       ]
