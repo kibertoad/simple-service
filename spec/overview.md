@@ -176,3 +176,10 @@ Capabilities for creating, retrieving, listing, updating, and deleting Office Ta
   - _Given_ the service has stored office tables _When_ the service process restarts _Then_ no office table data from the previous process lifecycle remains
 - **No API version prefixes** _(must, functional)_ — The system SHALL NOT include API version prefixes in endpoint URLs.
   - _Given_ any endpoint URL for office tables _When_ inspected _Then_ it does not contain a version path segment such as /v1/
+- **Office Table REST interface conventions** _(must, nonfunctional)_ — The system SHALL expose a REST interface for office tables following common HTTP and REST conventions.
+  - _Given_ a valid request to an office table endpoint using the HTTP method associated with the requested operation _When_ the request is processed _Then_ the response uses an HTTP status code consistent with common REST conventions for that operation
+  - _Given_ a request to an office table endpoint using an HTTP method not supported by that endpoint _When_ the request is processed _Then_ the response uses an HTTP status code consistent with common REST conventions indicating the method is not allowed
+  - _Given_ an invalid request payload for an office table create or update operation _When_ the request is processed _Then_ the response uses an HTTP status code consistent with common REST conventions indicating a client validation error
+- **Office Table in-memory response times** _(must, nonfunctional)_ — The system SHALL use an in-memory store with response times characteristic of in-memory data access for all Office Table CRUD operations.
+  - _Given_ the in-memory store contains office table data _When_ any CRUD operation is performed _Then_ the operation completes without disk I/O or durable storage access
+  - _Given_ the service is processing office table requests _When_ response times are observed _Then_ CRUD operations complete within a timeframe characteristic of in-memory data access

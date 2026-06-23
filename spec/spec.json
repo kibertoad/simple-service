@@ -1085,6 +1085,60 @@
               "outcome": "it does not contain a version path segment such as /v1/"
             }
           ]
+        },
+        {
+          "id": "REQ-035",
+          "title": "Office Table REST interface conventions",
+          "statement": "The system SHALL expose a REST interface for office tables following common HTTP and REST conventions.",
+          "kind": "nonfunctional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-035-AC-01",
+              "given": "a valid request to an office table endpoint using the HTTP method associated with the requested operation",
+              "when": "the request is processed",
+              "outcome": "the response uses an HTTP status code consistent with common REST conventions for that operation"
+            },
+            {
+              "id": "REQ-035-AC-02",
+              "given": "a request to an office table endpoint using an HTTP method not supported by that endpoint",
+              "when": "the request is processed",
+              "outcome": "the response uses an HTTP status code consistent with common REST conventions indicating the method is not allowed"
+            },
+            {
+              "id": "REQ-035-AC-03",
+              "given": "an invalid request payload for an office table create or update operation",
+              "when": "the request is processed",
+              "outcome": "the response uses an HTTP status code consistent with common REST conventions indicating a client validation error"
+            }
+          ]
+        },
+        {
+          "id": "REQ-036",
+          "title": "Office Table in-memory response times",
+          "statement": "The system SHALL use an in-memory store with response times characteristic of in-memory data access for all Office Table CRUD operations.",
+          "kind": "nonfunctional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-036-AC-01",
+              "given": "the in-memory store contains office table data",
+              "when": "any CRUD operation is performed",
+              "outcome": "the operation completes without disk I/O or durable storage access"
+            },
+            {
+              "id": "REQ-036-AC-02",
+              "given": "the service is processing office table requests",
+              "when": "response times are observed",
+              "outcome": "CRUD operations complete within a timeframe characteristic of in-memory data access"
+            }
+          ]
         }
       ]
     }
