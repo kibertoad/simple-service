@@ -1,3 +1,5 @@
+const { ValidationError } = require("../domain/errors");
+
 function encodeCursor(bear) {
   return Buffer.from(JSON.stringify({ id: bear.id })).toString("base64url");
 }
@@ -75,7 +77,11 @@ function createBearStore() {
     list({ cursor, limit = 50 } = {}) {
       let startId = "";
       if (cursor !== undefined && cursor !== "") {
-        startId = decodeCursor(cursor) ?? "invalid";
+        const decoded = decodeCursor(cursor);
+        if (decoded === null) {
+          throw new ValidationError("Invalid cursor");
+        }
+        startId = decoded;
       }
 
       const all = Array.from(byId.values());

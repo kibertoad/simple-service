@@ -1,5 +1,12 @@
 const { ValidationError } = require("./errors");
 
+/**
+ * Allowed pattern for Bear names.
+ * - Must be 1..100 characters (the pattern itself allows up to 100).
+ * - Must start with a Unicode letter, mark, or number.
+ * - Subsequent characters may include Unicode letters, marks, numbers,
+ *   spaces, periods, apostrophes, or hyphens.
+ */
 const NAME_PATTERN = /^[\p{L}\p{M}\p{N}][\p{L}\p{M}\p{N} .'\-]{0,99}$/u;
 
 function isPresentString(value) {
@@ -25,8 +32,14 @@ function buildBear({ id, name, age, colour }) {
  * Validate the mutable fields for a Bear create or update.
  * Age must be a non-negative integer. Name must be a unique-style
  * non-empty string up to 100 characters matching NAME_PATTERN.
- * Colour is accepted as provided (freeform), defaulting to an empty
- * string when omitted so the request can still be "exactly provided".
+ *
+ * Design note on REQ-010-AC-05 ("omits one or more mutable fields"):
+ * This criterion is interpreted as "the request representation entirely
+ * supersedes the previous mutable state"; name and age remain mandatory
+ * because update must satisfy all creation validation rules (REQ-010-AC-01).
+ * Colour is freeform and is the only truly optional mutable field. When
+ * omitted, it is stored as an empty string so the record still reflects
+ * exactly the data provided in the request.
  *
  * @param {Object} params
  * @param {string} [params.name]
@@ -54,9 +67,9 @@ function assertBearInput({ name, age, colour }) {
     throw new ValidationError("age must be non-negative");
   }
 
-  // colour is freeform and may be absent; treat absent as "" so callers can
-  // omit it without triggering a validation error, while still storing exactly
-  // the provided data.
+  // Colour is freeform and may be absent (defaults to "" at the service
+  // layer). Treat absent as acceptable here so callers can omit it; any
+  // provided value must still be a string.
   if (colour !== undefined && typeof colour !== "string") {
     throw new ValidationError("colour must be a string");
   }

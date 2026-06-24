@@ -358,6 +358,52 @@ describe("Bear CRUD endpoints", () => {
     assert.deepStrictEqual(res.body, { data: [], nextCursor: null });
   });
 
+  test("GET /bears defaults limit to 50", async () => {
+    const app = createApp();
+    for (let i = 0; i < 55; i++) {
+      await request(app)
+        .post("/bears")
+        .send({ name: `Bear${i.toString().padStart(2, "0")}`, age: 1, colour: "" });
+    }
+
+    const res = await request(app).get("/bears").expect(200);
+    assert.strictEqual(res.body.data.length, 50);
+    assert.strictEqual(typeof res.body.nextCursor, "string");
+  });
+
+  test("GET /bears rejects malformed cursor", async () => {
+    const app = createApp();
+    await request(app)
+      .get("/bears?cursor=not-valid-base64")
+      .expect(400, { error: "Invalid cursor", code: "VALIDATION_ERROR" });
+  });
+
+  test("GET /bears rejects non-integer limit", async () => {
+    const app = createApp();
+    await request(app)
+      .get("/bears?limit=foo")
+      .expect(400, { error: "limit must be a positive integer", code: "VALIDATION_ERROR" });
+  });
+
+  test("GET /bears rejects negative limit", async () => {
+    const app = createApp();
+    await request(app)
+      .get("/bears?limit=-5")
+      .expect(400, { error: "limit must be a positive integer", code: "VALIDATION_ERROR" });
+  });
+
+  test("GET /bears caps limit at 100", async () => {
+    const app = createApp();
+    for (let i = 0; i < 105; i++) {
+      await request(app)
+        .post("/bears")
+        .send({ name: `Bear${i.toString().padStart(3, "0")}`, age: 1, colour: "" });
+    }
+
+    const res = await request(app).get("/bears?limit=200").expect(200);
+    assert.strictEqual(res.body.data.length, 100);
+  });
+
   test("PUT /bears/:id fully replaces mutable fields", async () => {
     const app = createApp();
     const createRes = await request(app)
@@ -452,6 +498,51 @@ describe("Bear CRUD endpoints", () => {
     assert.notStrictEqual(res.body.id, "client-id");
     assert.ok(isUuidv7(res.body.id));
     assert.deepStrictEqual(Object.keys(res.body).sort(), ["age", "colour", "id", "name"]);
+  });
+
+  test("PUT /bears/:id ignores conflicting body id and keeps path id", async () => {
+    const app = createApp();
+    const createRes = await request(app)
+      .post("/bears")
+      .send({ name: "Paddington", age: 5, colour: "brown" });
+
+    const id = createRes.body.id;
+    const otherId = "00000000-0000-0000-0000-000000000000";
+    const res = await request(app)
+      .put(`/bears/${id}`)
+      .send({ id: otherId, name: "Pooh", age: 10, colour: "yellow" })
+      .expect(200);
+
+    assert.strictEqual(res.body.id, id);
+    assert.notStrictEqual(res.body.id, otherId);
+  });
+
+  test("PUT /bears/:id discards extra fields", async () => {
+    const app = createApp();
+    const createRes = await request(app)
+      .post("/bears")
+      .send({ name: "Paddington", age: 5, colour: "brown" });
+
+    const id = createRes.body.id;
+    const res = await request(app)
+      .put(`/bears/${id}`)
+      .send({ name: "Pooh", age: 10, colour: "yellow", extra: "drop" })
+      .expect(200);
+
+    assert.deepStrictEqual(Object.keys(res.body).sort(), ["age", "colour", "id", "name"]);
+  });
+
+  test("POST /bears accepts boundary values", async () => {
+    const app = createApp();
+    const longColour = "x".repeat(10000);
+    const res = await request(app)
+      .post("/bears")
+      .send({ name: "A".repeat(100), age: 0, colour: longColour })
+      .expect(201);
+
+    assert.strictEqual(res.body.name, "A".repeat(100));
+    assert.strictEqual(res.body.age, 0);
+    assert.strictEqual(res.body.colour, longColour);
   });
 
   test("two POST /bears requests assign distinct ids", async () => {

@@ -79,7 +79,9 @@ A Bear is represented with exactly four fields:
 ```
 
 - `id` — immutable, system-generated UUIDv7 identifier. Clients must not supply or modify it.
-- `name` — required non-empty string, unique across all Bears, no more than 100 characters, and may only contain Unicode letters, marks, numbers, spaces, periods, apostrophes, and hyphens.
+- `name` — required non-empty string, unique across all Bears, no more than 100 characters, and must match `NAME_PATTERN`:
+  `/^[\p{L}\p{M}\p{N}][\p{L}\p{M}\p{N}\s.'\-]{0,99}$/u`
+  (Unicode letter/mark/number start; spaces, periods, apostrophes, and hyphens allowed).
 - `age` — required non-negative integer.
 - `colour` — freeform string; may be omitted, in which case an empty string is stored.
 
@@ -162,6 +164,8 @@ Response (`200 OK`):
 
 The `id` is immutable and is taken from the URL; any `id` in the request body is ignored. The body must contain valid `name` and `age` values. Omitted `colour` is stored as an empty string.
 
+> Note on omitted fields: the spec requires full replacement semantics, meaning the request representation supersedes the previous mutable state. Name and age remain mandatory on update because update must satisfy all creation validation rules; colour is the only mutable field that may be omitted, defaulting to `""`.
+
 ## Delete a Bear
 
 ```bash
@@ -199,7 +203,7 @@ must contain all three User fields. Extra fields are discarded.
 
 | Status | Situation                                        | Example message                                      |
 | ------ | ------------------------------------------------ | ---------------------------------------------------- |
-| 400    | Missing/invalid fields, malformed id, or bad cursor/limit | `{ "error": "name is required", ... }`               |
+| 400    | Missing/invalid fields, malformed id, malformed cursor, or invalid limit | `{ "error": "name is required", ... }` |
 | 404    | Target does not exist                            | `{ "error": "Bear/User not found", "code": "..." }`  |
 | 409    | Unique key (email/name) already in use           | `{ "error": "Email/Name already in use", ... }`      |
 
