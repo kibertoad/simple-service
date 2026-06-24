@@ -5,24 +5,40 @@
   "references": [],
   "modules": [
     {
-      "name": "core",
-      "summary": "Core business logic and domain models",
-      "references": []
+      "name": "user-management",
+      "summary": "Handles user authentication, profiles, and access control",
+      "references": [
+        "src/modules/user-management/"
+      ]
     },
     {
-      "name": "api",
-      "summary": "Public HTTP API layer",
-      "references": []
+      "name": "order-processing",
+      "summary": "Manages order creation, fulfillment, and tracking",
+      "references": [
+        "src/modules/order-processing/"
+      ]
     },
     {
-      "name": "ui",
-      "summary": "User interface components",
-      "references": []
+      "name": "inventory",
+      "summary": "Coordinates product stock management and availability",
+      "references": [
+        "src/modules/inventory/"
+      ]
+    },
+    {
+      "name": "payment",
+      "summary": "Processes transactions and payment gateway integrations",
+      "references": [
+        "src/modules/payment/"
+      ]
     },
     {
       "name": "infrastructure",
       "summary": "Technical infrastructure and cross-cutting concerns",
-      "references": []
+      "references": [
+        "src/infrastructure/",
+        "config/"
+      ]
     }
   ]
 }

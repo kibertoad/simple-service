@@ -8,17 +8,21 @@ Core service handling application logic and module integration
 
 ## Modules
 
-### [core](modules/core.md)
+### [user-management](modules/user-management.md)
 
-Core business logic and domain models
+Handles user authentication, profiles, and access control
 
-### [api](modules/api.md)
+### [order-processing](modules/order-processing.md)
 
-Public HTTP API layer
+Manages order creation, fulfillment, and tracking
 
-### [ui](modules/ui.md)
+### [inventory](modules/inventory.md)
 
-User interface components
+Coordinates product stock management and availability
+
+### [payment](modules/payment.md)
+
+Processes transactions and payment gateway integrations
 
 ### [infrastructure](modules/infrastructure.md)
 

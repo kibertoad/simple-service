@@ -1,3 +1,0 @@
-# ui
-
-User interface components
