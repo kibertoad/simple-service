@@ -2,42 +2,28 @@
   "type": "service",
   "name": "main-service",
   "summary": "Core service handling application logic and module integration",
-  "references": [],
+  "references": [
+    "/tmp/blueprint-Jv3j2E"
+  ],
   "modules": [
     {
       "name": "user-management",
       "summary": "Handles user authentication, profiles, and access control",
       "references": [
-        "src/modules/user-management/"
-      ]
-    },
-    {
-      "name": "order-processing",
-      "summary": "Manages order creation, fulfillment, and tracking",
-      "references": [
-        "src/modules/order-processing/"
-      ]
-    },
-    {
-      "name": "inventory",
-      "summary": "Coordinates product stock management and availability",
-      "references": [
-        "src/modules/inventory/"
-      ]
-    },
-    {
-      "name": "payment",
-      "summary": "Processes transactions and payment gateway integrations",
-      "references": [
-        "src/modules/payment/"
+        "/tmp/blueprint-Jv3j2E/src/core/",
+        "/tmp/blueprint-Jv3j2E/modules/core/"
       ]
     },
     {
       "name": "infrastructure",
       "summary": "Technical infrastructure and cross-cutting concerns",
       "references": [
-        "src/infrastructure/",
-        "config/"
+        "/tmp/blueprint-Jv3j2E/src/api/",
+        "/tmp/blueprint-Jv3j2E/modules/api/",
+        "/tmp/blueprint-Jv3j2E/src/ui/",
+        "/tmp/blueprint-Jv3j2E/modules/ui/",
+        "/tmp/blueprint-Jv3j2E/src/utils/",
+        "/tmp/blueprint-Jv3j2E/modules/utils/"
       ]
     }
   ]

@@ -5,7 +5,7 @@ REST endpoints to create users and fully replace existing user records.
 
 ## Prerequisites
 
-- Node.js >= 18
+- Node.js >= 18 (the `uuid` package provides UUIDv7 support for all supported versions)
 
 ## Installation
 
@@ -43,6 +43,11 @@ PORT=8080 npm start
 | POST   | `/echo`                  | Echoes back the JSON body you send.                                    |
 | POST   | `/users`                 | Creates a new User with a system-generated UUID.                       |
 | PUT    | `/users/:id`             | Fully replaces an existing User record.                                |
+| POST   | `/bears`                 | Creates a new Bear with a system-generated UUIDv7 id.                  |
+| GET    | `/bears`                 | Lists Bears using cursor-based pagination.                             |
+| GET    | `/bears/:id`             | Retrieves a single Bear by id.                                         |
+| PUT    | `/bears/:id`             | Fully replaces an existing Bear's mutable fields.                      |
+| DELETE | `/bears/:id`             | Deletes a Bear by id.                                                  |
 | POST   | `/office-tables`         | Creates a new Office Table with a system-generated UUIDv7.             |
 | GET    | `/office-tables`         | Lists Office Tables with cursor-based pagination.                      |
 | GET    | `/office-tables/:id`     | Retrieves an Office Table by its UUIDv7 identifier.                    |
@@ -65,6 +70,26 @@ A User is represented with exactly three fields:
 - `name` — required string.
 - `email` — required string, unique across all Users.
 
+## Bear resource
+
+A Bear is represented with exactly four fields:
+
+```json
+{
+  "id": "0190a1b2-3c4d-7e8f-9a0b-1c2d3e4f5a6b",
+  "name": "Paddington",
+  "age": 5,
+  "colour": "brown"
+}
+```
+
+- `id` — immutable, system-generated UUIDv7 identifier. Clients must not supply or modify it.
+- `name` — required non-empty string, unique across all Bears, no more than 100 characters, and must match `NAME_PATTERN`:
+  `/^[\p{L}\p{M}\p{N}][\p{L}\p{M}\p{N}\s.'\-]{0,99}$/u`
+  (Unicode letter/mark/number start; spaces, periods, apostrophes, and hyphens allowed).
+- `age` — required non-negative integer.
+- `colour` — freeform string; may be omitted, in which case an empty string is stored.
+
 ## Create a User
 
 ```bash
@@ -84,6 +109,75 @@ Response (`201 Created`):
 ```
 
 Extra fields are discarded and any client-supplied `id` is ignored.
+
+## Create a Bear
+
+```bash
+curl -X POST http://localhost:3000/bears \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Paddington", "age": 5, "colour": "brown"}'
+```
+
+Response (`201 Created`):
+
+```json
+{
+  "id": "0190a1b2-3c4d-7e8f-9a0b-1c2d3e4f5a6b",
+  "name": "Paddington",
+  "age": 5,
+  "colour": "brown"
+}
+```
+
+The `id` is a UUIDv7 generated locally. Extra fields are discarded and any client-supplied `id` is ignored.
+
+## List Bears
+
+```bash
+curl "http://localhost:3000/bears?limit=10"
+```
+
+Response (`200 OK`):
+
+```json
+{
+  "data": [ /* up to 10 Bear records */ ],
+  "nextCursor": "eyJpZCI6Ii4uLiJ9"
+}
+```
+
+Use `?cursor=...` to fetch subsequent pages. The default `limit` is 50 and the maximum is 100.
+
+## Replace a Bear
+
+```bash
+curl -X PUT "http://localhost:3000/bears/0190a1b2-3c4d-7e8f-9a0b-1c2d3e4f5a6b" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Pooh", "age": 10, "colour": "yellow"}'
+```
+
+Response (`200 OK`):
+
+```json
+{
+  "id": "0190a1b2-3c4d-7e8f-9a0b-1c2d3e4f5a6b",
+  "name": "Pooh",
+  "age": 10,
+  "colour": "yellow"
+}
+```
+
+The `id` is immutable and is taken from the URL; any `id` in the request body is ignored. The body must contain valid `name` and `age` values. Omitted `colour` is stored as an empty string.
+
+> Note on omitted fields: the spec requires full replacement semantics, meaning the request representation supersedes the previous mutable state. Name and age remain mandatory on update because update must satisfy all creation validation rules; colour is the only mutable field that may be omitted, defaulting to `""`.
+
+## Delete a Bear
+
+```bash
+curl -X DELETE "http://localhost:3000/bears/0190a1b2-3c4d-7e8f-9a0b-1c2d3e4f5a6b"
+```
+
+Response (`204 No Content`).
 
 ## Replace a User
 
@@ -112,16 +206,16 @@ must contain all three User fields. Extra fields are discarded.
 
 ## User error responses
 
-| Status | Situation                              | Example message                                |
-| ------ | -------------------------------------- | ---------------------------------------------- |
-| 400    | Missing/invalid fields or malformed id | `{ "error": "name is required", ... }`         |
-| 404    | Target User does not exist on PUT      | `{ "error": "User not found", "code": "..." }` |
-| 409    | Email already in use                   | `{ "error": "Email already in use", ... }`     |
+| Status | Situation                                        | Example message                                      |
+| ------ | ------------------------------------------------ | ---------------------------------------------------- |
+| 400    | Missing/invalid fields, malformed id, malformed cursor, or invalid limit | `{ "error": "name is required", ... }` |
+| 404    | Target does not exist                            | `{ "error": "Bear/User not found", "code": "..." }`  |
+| 409    | Unique key (email/name) already in use           | `{ "error": "Email/Name already in use", ... }`      |
 
 ## User persistence
 
-User data is stored in memory only. When the process restarts, all persisted
-User records are lost.
+User and Bear data is stored in memory only. When the process restarts, all persisted
+records are lost.
 
 ## Office Table resource
 
@@ -238,6 +332,8 @@ prefix (for example, `/v1/` is not used).
 ├── src
 │   ├── app.js
 │   ├── domain
+│   │   ├── bear.js
+│   │   ├── bear.test.js
 │   │   ├── errors.js
 │   │   ├── officeTable.js
 │   │   ├── officeTable.test.js
@@ -245,15 +341,24 @@ prefix (for example, `/v1/` is not used).
 │   │   └── user.test.js
 │   ├── index.js
 │   ├── routes
+│   │   ├── bears.js
 │   │   ├── officeTables.js
+│   │   ├── organizations.js
 │   │   └── users.js
 │   ├── service
+│   │   ├── bearService.js
+│   │   ├── bearService.test.js
 │   │   ├── officeTableService.js
 │   │   ├── officeTableService.test.js
+│   │   ├── organizationService.js
+│   │   ├── organizationService.test.js
 │   │   ├── userService.js
 │   │   └── userService.test.js
 │   └── store
+│       ├── bearStore.js
 │       ├── officeTable.js
+│       ├── organizationStore.js
+
 │       └── userStore.js
 └── test
     └── app.test.js

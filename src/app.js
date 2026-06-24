@@ -8,6 +8,9 @@ const { createOrganizationsRouter } = require("./routes/organizations");
 const { createOfficeTableStore } = require("./store/officeTable");
 const { createOfficeTableService } = require("./service/officeTableService");
 const { createOfficeTablesRouter } = require("./routes/officeTables");
+const { createBearStore } = require("./store/bearStore");
+const { createBearService } = require("./service/bearService");
+const { createBearsRouter } = require("./routes/bears");
 const { DomainError } = require("./domain/errors");
 
 /**
@@ -47,6 +50,11 @@ function createApp() {
   const officeTableStore = createOfficeTableStore();
   const officeTableService = createOfficeTableService({ store: officeTableStore });
   app.use("/office-tables", createOfficeTablesRouter({ officeTableService }));
+
+  // Bear routes
+  const bearStore = createBearStore();
+  const bearService = createBearService({ store: bearStore });
+  app.use("/bears", createBearsRouter({ bearService }));
 
   // 404 handler
   app.use((req, res) => {

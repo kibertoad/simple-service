@@ -225,6 +225,234 @@
       ]
     },
     {
+      "name": "Bear CRUD",
+      "summary": "Capabilities for creating, reading, listing, updating, and deleting Bear resources with id/name/age/colour schema, UUIDv7 generation, validation rules for name and age, freeform colour, and cursor-based pagination backed by in-memory storage.",
+      "requirements": [
+        {
+          "id": "REQ-007",
+          "title": "Create Bear",
+          "statement": "The system SHALL create a bear record from a client-provided name, age, and colour, assigning a service-generated UUIDv7 identifier and returning the complete record.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-007-AC-01",
+              "given": "a non-empty, unique name no longer than 100 characters that also satisfies applicable character/pattern restrictions, a non-negative integer age, and a freeform colour",
+              "when": "a create request is submitted",
+              "outcome": "the system stores the bear and returns the record including the generated UUIDv7 identifier"
+            },
+            {
+              "id": "REQ-007-AC-02",
+              "given": "a create request with an empty name",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the request"
+            },
+            {
+              "id": "REQ-007-AC-03",
+              "given": "a create request with a name that exceeds 100 characters",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the request"
+            },
+            {
+              "id": "REQ-007-AC-04",
+              "given": "a create request with a name that duplicates an existing bear name",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the request"
+            },
+            {
+              "id": "REQ-007-AC-05",
+              "given": "a create request with a name that violates applicable character/pattern restrictions",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the request"
+            },
+            {
+              "id": "REQ-007-AC-06",
+              "given": "a create request with a negative age",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the request"
+            },
+            {
+              "id": "REQ-007-AC-07",
+              "given": "a create request with an age that is not an integer",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the request"
+            }
+          ]
+        },
+        {
+          "id": "REQ-008",
+          "title": "Read Bear",
+          "statement": "The system SHALL retrieve a single bear by its UUIDv7 identifier.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-008-AC-01",
+              "given": "a bear exists with a known UUIDv7 identifier",
+              "when": "a read request is made for that identifier",
+              "outcome": "the system returns the corresponding bear record"
+            },
+            {
+              "id": "REQ-008-AC-02",
+              "given": "a read request for a UUIDv7 identifier that does not exist",
+              "when": "the request is made",
+              "outcome": "the system indicates that the bear was not found"
+            }
+          ]
+        },
+        {
+          "id": "REQ-009",
+          "title": "List Bears",
+          "statement": "The system SHALL list all stored bears using cursor-based pagination.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-009-AC-01",
+              "given": "one or more bears exist in storage",
+              "when": "a list request is made",
+              "outcome": "the system returns a paginated result set using cursor-based pagination"
+            },
+            {
+              "id": "REQ-009-AC-02",
+              "given": "no bears exist",
+              "when": "a list request is made",
+              "outcome": "the system returns an empty paginated result set"
+            }
+          ]
+        },
+        {
+          "id": "REQ-010",
+          "title": "Update Bear",
+          "statement": "The system SHALL update an existing bear, identified by UUIDv7, by fully replacing its mutable fields (name, age, colour).",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-010-AC-01",
+              "given": "an existing bear and a replacement representation that satisfies all creation validation rules",
+              "when": "an update request is submitted",
+              "outcome": "the system overwrites the bear's mutable fields and returns the updated record"
+            },
+            {
+              "id": "REQ-010-AC-02",
+              "given": "an update request with an invalid age",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the update"
+            },
+            {
+              "id": "REQ-010-AC-03",
+              "given": "an update request with a duplicate name",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the update"
+            },
+            {
+              "id": "REQ-010-AC-04",
+              "given": "an update request with an empty name",
+              "when": "the request is submitted",
+              "outcome": "the system rejects the update"
+            },
+            {
+              "id": "REQ-010-AC-05",
+              "given": "an update request that omits one or more mutable fields",
+              "when": "the request is submitted",
+              "outcome": "the system applies full replacement semantics and stores exactly the provided values"
+            }
+          ]
+        },
+        {
+          "id": "REQ-011",
+          "title": "Delete Bear",
+          "statement": "The system SHALL delete a bear by its UUIDv7 identifier.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-011-AC-01",
+              "given": "an existing bear",
+              "when": "a delete request is made by identifier",
+              "outcome": "the system removes the bear from storage"
+            },
+            {
+              "id": "REQ-011-AC-02",
+              "given": "a delete request for a UUIDv7 identifier that does not exist",
+              "when": "the request is made",
+              "outcome": "the system indicates that the bear was not found"
+            }
+          ]
+        },
+        {
+          "id": "REQ-012",
+          "title": "Bear in-memory persistence",
+          "statement": "The system SHALL retain all bear records in volatile, in-memory storage with no persistence across process restarts.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-012-AC-01",
+              "given": "bears have been created in the service",
+              "when": "the service process restarts",
+              "outcome": "no bear records remain"
+            }
+          ]
+        },
+        {
+          "id": "REQ-013",
+          "title": "In-memory operation latency",
+          "statement": "The system SHALL process all CRUD operations with latency consistent with in-memory data access and without reliance on external persistence services.",
+          "kind": "functional",
+          "priority": "should",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-013-AC-01",
+              "given": "bear CRUD operations are executed",
+              "when": "the system processes them",
+              "outcome": "responses are produced without reliance on external persistence services and with latency consistent with in-memory access"
+            }
+          ]
+        },
+        {
+          "id": "REQ-014",
+          "title": "Local UUIDv7 generation",
+          "statement": "The system SHALL generate UUIDv7 identifiers using only local runtime capabilities.",
+          "kind": "functional",
+          "priority": "should",
+          "sourceBlockIds": [
+            "task_84b1038c357e"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-014-AC-01",
+              "given": "the service generates a bear identifier",
+              "when": "identifier generation occurs",
+              "outcome": "the identifier is produced using only local runtime capabilities without depending on external network services"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Organization Management",
       "summary": "Capabilities for creating and fully replacing Organization resources with a fixed id/name/slug schema, UUID generation, and slug uniqueness enforced in an in-memory store.",
       "requirements": [
@@ -1186,6 +1414,62 @@
     },
     {
       "id": "RULE-006",
+      "rule": "A Bear id is immutable and is system-assigned as a UUIDv7 value at creation time; clients cannot supply or modify it.",
+      "rationale": "Guarantees unique, ordered identity without client coordination and prevents identity spoofing or alteration.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-007",
+      "rule": "A Bear name acts as a unique key across the entire bear collection.",
+      "rationale": "Prevents duplicate bear records and ambiguous identification.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-008",
+      "rule": "A Bear age is strictly a non-negative integer; fractional or negative values are prohibited.",
+      "rationale": "Ensures age is stored as a valid whole number that represents a meaningful duration.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-009",
+      "rule": "A Bear name must be non-empty, must not exceed 100 characters, and is subject to additional applicable character/pattern restrictions.",
+      "rationale": "Maintains data quality and consistent naming constraints.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-010",
+      "rule": "A Bear colour is freeform text with no predefined enumeration, format, or length constraint.",
+      "rationale": "Allows clients to capture colour values flexibly without constraining the domain model.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-011",
+      "rule": "Bear updates use full replacement semantics, meaning the request representation entirely supersedes the previous mutable state of the resource.",
+      "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-012",
+      "rule": "Bear data persists only in memory for the lifetime of the process; no durable storage or cross-process replication is provided.",
+      "rationale": "Matches the explicit in-memory store requirement and sets clear durability expectations.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-013",
       "rule": "An Organization id is immutable and is system-assigned as a UUID at creation time.",
       "rationale": "Guarantees unique identity without requiring client coordination and prevents identity spoofing or alteration.",
       "sourceBlockIds": [
@@ -1193,7 +1477,7 @@
       ]
     },
     {
-      "id": "RULE-007",
+      "id": "RULE-014",
       "rule": "The slug field acts as a unique key across the entire Organization population and must match the lowercase-alphanumeric-hyphen pattern.",
       "rationale": "Provides a human-readable unique identifier while preventing ambiguous or malformed slugs.",
       "sourceBlockIds": [
@@ -1201,7 +1485,7 @@
       ]
     },
     {
-      "id": "RULE-008",
+      "id": "RULE-015",
       "rule": "Replacement of an Organization is a full-record operation requiring id, name, and slug; partial updates are not permitted.",
       "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
       "sourceBlockIds": [
@@ -1209,7 +1493,7 @@
       ]
     },
     {
-      "id": "RULE-009",
+      "id": "RULE-016",
       "rule": "An Organization entity has exactly the fields id, name, and slug.",
       "rationale": "Keeps the domain model minimal and predictable for clients.",
       "sourceBlockIds": [
@@ -1217,7 +1501,7 @@
       ]
     },
     {
-      "id": "RULE-010",
+      "id": "RULE-017",
       "rule": "Organization data persists only in memory for the lifetime of the process; no durable storage or cross-process replication is provided.",
       "rationale": "Matches the explicit in-memory store requirement and sets clear durability expectations.",
       "sourceBlockIds": [
@@ -1225,7 +1509,7 @@
       ]
     },
     {
-      "id": "RULE-011",
+      "id": "RULE-018",
       "rule": "A Building entity has exactly the fields id, name, and address.",
       "rationale": "Schema defined by the product owner.",
       "sourceBlockIds": [
@@ -1233,7 +1517,7 @@
       ]
     },
     {
-      "id": "RULE-012",
+      "id": "RULE-019",
       "rule": "A Building name must not exceed 80 characters and a Building address must not exceed 160 characters.",
       "rationale": "Input validation rules provided by the product owner.",
       "sourceBlockIds": [
@@ -1241,7 +1525,7 @@
       ]
     },
     {
-      "id": "RULE-013",
+      "id": "RULE-020",
       "rule": "No uniqueness constraints apply to the Building name or address fields.",
       "rationale": "The product owner stated there are no uniqueness constraints beyond the identifier.",
       "sourceBlockIds": [
@@ -1249,7 +1533,7 @@
       ]
     },
     {
-      "id": "RULE-014",
+      "id": "RULE-021",
       "rule": "Deletion of a Building permanently removes it from the in-memory store.",
       "rationale": "The product owner specified hard delete.",
       "sourceBlockIds": [
@@ -1257,7 +1541,7 @@
       ]
     },
     {
-      "id": "RULE-015",
+      "id": "RULE-022",
       "rule": "Building data persists only in memory for the lifetime of the process.",
       "rationale": "The product owner specified fully transient data.",
       "sourceBlockIds": [
@@ -1265,7 +1549,7 @@
       ]
     },
     {
-      "id": "RULE-016",
+      "id": "RULE-023",
       "rule": "A Car entity has a fixed set of fields and a system-generated unique identifier, and persists only in memory for the lifetime of the process.",
       "rationale": "Ensures a predictable transient model for simple CRUD.",
       "sourceBlockIds": [
@@ -1273,7 +1557,7 @@
       ]
     },
     {
-      "id": "RULE-017",
+      "id": "RULE-024",
       "rule": "A Bicycle entity has a fixed set of fields and a system-generated unique identifier, and persists only in memory for the lifetime of the process.",
       "rationale": "Ensures a predictable transient model for simple CRUD.",
       "sourceBlockIds": [
@@ -1281,7 +1565,7 @@
       ]
     },
     {
-      "id": "RULE-018",
+      "id": "RULE-025",
       "rule": "An Office Table id is an immutable UUIDv7 generated by the system at resource creation; client-provided ids are not accepted.",
       "rationale": "Provides time-ordered, globally unique identifiers while preventing identity spoofing.",
       "sourceBlockIds": [
@@ -1289,7 +1573,7 @@
       ]
     },
     {
-      "id": "RULE-019",
+      "id": "RULE-026",
       "rule": "An Office Table price must be non-negative for every persisted resource.",
       "rationale": "Prevents invalid financial values for furniture records.",
       "sourceBlockIds": [
@@ -1297,7 +1581,7 @@
       ]
     },
     {
-      "id": "RULE-020",
+      "id": "RULE-027",
       "rule": "An Office Table entity has exactly the fields id, price, and date bought.",
       "rationale": "Keeps the furniture resource model minimal and predictable for clients.",
       "sourceBlockIds": [
@@ -1305,7 +1589,7 @@
       ]
     },
     {
-      "id": "RULE-021",
+      "id": "RULE-028",
       "rule": "Replacement of an Office Table is a full replacement of all stored fields; partial updates via PATCH are prohibited.",
       "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
       "sourceBlockIds": [
@@ -1313,7 +1597,7 @@
       ]
     },
     {
-      "id": "RULE-022",
+      "id": "RULE-029",
       "rule": "Office Table data persists only in memory for the lifetime of the process.",
       "rationale": "Matches the explicit fully ephemeral in-memory store requirement.",
       "sourceBlockIds": [
@@ -1321,7 +1605,7 @@
       ]
     },
     {
-      "id": "RULE-023",
+      "id": "RULE-030",
       "rule": "Office Table endpoint URLs SHALL NOT contain API version path segments.",
       "rationale": "The product owner specified no API version prefixes.",
       "sourceBlockIds": [
@@ -1329,7 +1613,7 @@
       ]
     },
     {
-      "id": "RULE-024",
+      "id": "RULE-031",
       "rule": "An office table is a physical furniture item; the data model and business logic apply to furniture, not database tables or abstract entities.",
       "rationale": "Clarifies the domain scope so that the resource is interpreted as office furniture rather than database tables or other abstract constructs.",
       "sourceBlockIds": [
