@@ -2,29 +2,27 @@
   "type": "service",
   "name": "main-service",
   "summary": "Core service handling application logic and module integration",
-  "references": [
-    "/tmp/blueprint-5ou1BR"
-  ],
+  "references": [],
   "modules": [
     {
       "name": "core",
       "summary": "Core business logic and domain models",
-      "references": [
-        "/tmp/blueprint-5ou1BR/src/core/",
-        "/tmp/blueprint-5ou1BR/modules/core/"
-      ]
+      "references": []
+    },
+    {
+      "name": "api",
+      "summary": "Public HTTP API layer",
+      "references": []
+    },
+    {
+      "name": "ui",
+      "summary": "User interface components",
+      "references": []
     },
     {
       "name": "infrastructure",
       "summary": "Technical infrastructure and cross-cutting concerns",
-      "references": [
-        "/tmp/blueprint-5ou1BR/src/api/",
-        "/tmp/blueprint-5ou1BR/modules/api/",
-        "/tmp/blueprint-5ou1BR/src/ui/",
-        "/tmp/blueprint-5ou1BR/modules/ui/",
-        "/tmp/blueprint-5ou1BR/src/utils/",
-        "/tmp/blueprint-5ou1BR/modules/utils/"
-      ]
+      "references": []
     }
   ]
 }

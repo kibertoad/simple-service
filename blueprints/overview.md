@@ -12,6 +12,14 @@ Core service handling application logic and module integration
 
 Core business logic and domain models
 
+### [api](modules/api.md)
+
+Public HTTP API layer
+
+### [ui](modules/ui.md)
+
+User interface components
+
 ### [infrastructure](modules/infrastructure.md)
 
 Technical infrastructure and cross-cutting concerns
