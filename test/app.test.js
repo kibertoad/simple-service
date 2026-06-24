@@ -449,4 +449,80 @@ describe("Office Table Management endpoints", () => {
     assert.strictEqual(res.req.path.startsWith("/v1"), false);
     assert.strictEqual(res.req.path, "/office-tables");
   });
+
+  test("GET /office-tables returns empty array when no tables exist", async () => {
+    const app = createApp();
+    const res = await request(app).get("/office-tables").expect(200);
+
+    assert.ok(Array.isArray(res.body));
+    assert.deepStrictEqual(res.body, []);
+    assert.strictEqual(res.headers["x-next-cursor"], undefined);
+  });
+
+  test("GET /office-tables returns all items and no cursor when fewer than limit", async () => {
+    const app = createApp();
+    const a = await request(app)
+      .post("/office-tables")
+      .send({ price: 1, dateBought: "2026-06-23" })
+      .expect(201);
+    const b = await request(app)
+      .post("/office-tables")
+      .send({ price: 2, dateBought: "2026-06-24" })
+      .expect(201);
+
+    const res = await request(app).get("/office-tables?limit=5").expect(200);
+
+    assert.ok(Array.isArray(res.body));
+    assert.strictEqual(res.body.length, 2);
+    assert.strictEqual(res.headers["x-next-cursor"], undefined);
+    assert.deepStrictEqual(new Set(res.body.map((t) => t.id)), new Set([a.body.id, b.body.id]));
+  });
+
+  test("GET /office-tables limit defaults to 20", async () => {
+    const app = createApp();
+    for (let i = 0; i < 21; i++) {
+      await request(app)
+        .post("/office-tables")
+        .send({ price: i, dateBought: "2026-06-23" })
+        .expect(201);
+    }
+
+    const res = await request(app).get("/office-tables").expect(200);
+    assert.strictEqual(res.body.length, 20);
+    assert.ok(res.headers["x-next-cursor"]);
+  });
+
+  test("GET /office-tables rejects out-of-range limit", async () => {
+    const app = createApp();
+    await request(app).get("/office-tables?limit=0").expect(400);
+    await request(app).get("/office-tables?limit=101").expect(400);
+    await request(app).get("/office-tables?limit=abc").expect(400);
+  });
+
+  test("GET /office-tables/:id returns 400 for malformed id", async () => {
+    const app = createApp();
+    await request(app).get("/office-tables/not-a-uuid").expect(400);
+  });
+
+  test("PATCH /office-tables is not allowed", async () => {
+    const app = createApp();
+    const createRes = await request(app)
+      .post("/office-tables")
+      .send({ price: 100, dateBought: "2026-06-23" })
+      .expect(201);
+
+    await request(app)
+      .patch(`/office-tables/${createRes.body.id}`)
+      .send({ price: 999 })
+      .expect(405)
+      .expect("Allow", /GET/);
+  });
+
+  test("POST /office-tables/:id is not allowed", async () => {
+    const app = createApp();
+    await request(app)
+      .post("/office-tables/0193e272-5b18-7ff9-a1a2-123456789abc")
+      .send({ price: 100, dateBought: "2026-06-23" })
+      .expect(405);
+  });
 });

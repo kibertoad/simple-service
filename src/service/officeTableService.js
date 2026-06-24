@@ -1,4 +1,4 @@
-const { randomUUIDv7 } = require("node:crypto");
+const { v7: uuidv7 } = require("uuid");
 const {
   buildOfficeTable,
   isUuidV7,
@@ -15,7 +15,7 @@ const { decodeCursor } = require("../store/officeTable");
  * @param {ReturnType<import("../store/officeTable").createOfficeTableStore>} deps.store
  * @param {() => string} [deps.generateId]
  */
-function createOfficeTableService({ store, generateId = randomUUIDv7 }) {
+function createOfficeTableService({ store, generateId = uuidv7 }) {
   function createOfficeTable(input) {
     if (!input || typeof input !== "object") {
       throw new ValidationError("Invalid request body");

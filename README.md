@@ -137,7 +137,8 @@ An Office Table (physical furniture) is represented with exactly three fields:
 
 - `id` — immutable, system-generated UUIDv7. Clients must not supply or modify it.
 - `price` — required non-negative finite number.
-- `dateBought` — required string.
+- `dateBought` — required string. JSON key is camelCase (`dateBought`) despite
+the descriptive requirement "date bought".
 
 ## Create an Office Table
 
@@ -189,7 +190,9 @@ curl -X PUT http://localhost:3000/office-tables/0193e272-5b18-7ff9-a1a2-12345678
 
 Response (`200 OK`) with the updated record. This is a full replacement — the
 stored resource is overwritten with exactly the supplied `price` and
-`dateBought`.
+`dateBought`. The `id` is taken from the URL path only; any `id` supplied in
+the request body is ignored. This differs from the User and Organization
+endpoints, which require a matching `id` in the request body.
 
 ## Delete an Office Table
 
@@ -199,12 +202,19 @@ curl -X DELETE http://localhost:3000/office-tables/0193e272-5b18-7ff9-a1a2-12345
 
 Response (`204 No Content`) on success.
 
+## Office Table field naming
+
+The data model calls the field "date bought" descriptively. The JSON property
+name used by the API is `dateBought` (camelCase). Clients should send and
+expect that key spelling.
+
 ## Office Table error responses
 
 | Status | Situation                               | Example message                                 |
 | ------ | --------------------------------------- | ----------------------------------------------- |
 | 400    | Missing/invalid fields or malformed id  | `{ "error": "price must be non-negative" }`     |
 | 404    | Target Office Table does not exist      | `{ "error": "Office table not found" }`         |
+| 405    | HTTP method not allowed on this path    | `{ "error": "Method Not Allowed" }`             |
 
 ## Office Table persistence
 
