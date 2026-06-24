@@ -5,6 +5,9 @@ const { createUsersRouter } = require("./routes/users");
 const { createOrganizationStore } = require("./store/organizationStore");
 const { createOrganizationService } = require("./service/organizationService");
 const { createOrganizationsRouter } = require("./routes/organizations");
+const { createBearStore } = require("./store/bearStore");
+const { createBearService } = require("./service/bearService");
+const { createBearsRouter } = require("./routes/bears");
 const { DomainError } = require("./domain/errors");
 
 /**
@@ -39,6 +42,11 @@ function createApp() {
   const organizationStore = createOrganizationStore();
   const organizationService = createOrganizationService({ store: organizationStore });
   app.use("/organizations", createOrganizationsRouter({ organizationService }));
+
+  // Bear routes
+  const bearStore = createBearStore();
+  const bearService = createBearService({ store: bearStore });
+  app.use("/bears", createBearsRouter({ bearService }));
 
   // 404 handler
   app.use((req, res) => {

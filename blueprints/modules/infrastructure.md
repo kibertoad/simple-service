@@ -4,9 +4,9 @@ Technical infrastructure and cross-cutting concerns
 
 
 **Code references:**
-- `/tmp/blueprint-5ou1BR/src/api/`
-- `/tmp/blueprint-5ou1BR/modules/api/`
-- `/tmp/blueprint-5ou1BR/src/ui/`
-- `/tmp/blueprint-5ou1BR/modules/ui/`
-- `/tmp/blueprint-5ou1BR/src/utils/`
-- `/tmp/blueprint-5ou1BR/modules/utils/`
+- `/tmp/blueprint-Jv3j2E/src/api/`
+- `/tmp/blueprint-Jv3j2E/modules/api/`
+- `/tmp/blueprint-Jv3j2E/src/ui/`
+- `/tmp/blueprint-Jv3j2E/modules/ui/`
+- `/tmp/blueprint-Jv3j2E/src/utils/`
+- `/tmp/blueprint-Jv3j2E/modules/utils/`
