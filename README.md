@@ -269,6 +269,32 @@ Run HTTP-level integration tests only:
 npm run test:integration
 ```
 
+## Running locally with Docker Compose
+
+This service has no external service dependencies, so no WireMock stubs are
+required. A plain `docker-compose up` builds and starts the service.
+
+```bash
+docker-compose up --build
+```
+
+The health check waits for the service to respond on `http://localhost:3000/health`.
+
+### CI
+
+The same Docker Compose setup can be used in CI; there are no mock services to
+start or external base URLs to configure. For example, in GitHub Actions:
+
+```yaml
+- run: docker-compose up --build -d
+- run: |
+    for i in {1..30}; do
+      curl -sf http://localhost:3000/health && break
+      sleep 1
+    done
+- run: curl -sf http://localhost:3000/office-tables
+```
+
 ## License
 
 MIT
