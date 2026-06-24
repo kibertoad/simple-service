@@ -46,7 +46,12 @@ function createApp() {
   // Office Table routes
   const officeTableStore = createOfficeTableStore();
   const officeTableService = createOfficeTableService({ store: officeTableStore });
-  app.use("/office-tables", createOfficeTablesRouter({ officeTableService }));
+  app.use("/office-tables", (req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'DELETE') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+  next();
+}, createOfficeTablesRouter({ officeTableService }));
 
   // 404 handler
   app.use((req, res) => {
