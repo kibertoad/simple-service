@@ -5,6 +5,9 @@ const { createUsersRouter } = require("./routes/users");
 const { createOrganizationStore } = require("./store/organizationStore");
 const { createOrganizationService } = require("./service/organizationService");
 const { createOrganizationsRouter } = require("./routes/organizations");
+const { createOfficeTableStore } = require("./store/officeTable");
+const { createOfficeTableService } = require("./service/officeTableService");
+const { createOfficeTablesRouter } = require("./routes/officeTables");
 const { createBearStore } = require("./store/bearStore");
 const { createBearService } = require("./service/bearService");
 const { createBearsRouter } = require("./routes/bears");
@@ -42,6 +45,11 @@ function createApp() {
   const organizationStore = createOrganizationStore();
   const organizationService = createOrganizationService({ store: organizationStore });
   app.use("/organizations", createOrganizationsRouter({ organizationService }));
+
+  // Office Table routes
+  const officeTableStore = createOfficeTableStore();
+  const officeTableService = createOfficeTableService({ store: officeTableStore });
+  app.use("/office-tables", createOfficeTablesRouter({ officeTableService }));
 
   // Bear routes
   const bearStore = createBearStore();

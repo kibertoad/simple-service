@@ -1,6 +1,6 @@
 {
-  "service": "user-service",
-  "summary": "A simple in-memory user management service exposing REST endpoints to create users and fully replace existing user records, with system-generated UUID identifiers and unique email addresses.",
+  "service": "in-memory-resource-service",
+  "summary": "A transient, in-memory REST service managing multiple resource collections: Users, Organizations, Buildings, Cars, Bicycles, and Office Tables. Each resource type supports create/get/list/update/delete operations, uses system-generated identifiers, enforces simple per-resource domain validation, and persists only for the lifetime of the process.",
   "groups": [
     {
       "name": "User Management",
@@ -451,6 +451,924 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Organization Management",
+      "summary": "Capabilities for creating and fully replacing Organization resources with a fixed id/name/slug schema, UUID generation, and slug uniqueness enforced in an in-memory store.",
+      "requirements": [
+        {
+          "id": "REQ-007",
+          "title": "Create Organization endpoint",
+          "statement": "The system SHALL expose a REST endpoint that creates an Organization from a supplied name and slug.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_58171069de9d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-007-AC-01",
+              "given": "a creation request containing valid values for name and slug",
+              "when": "the request is processed",
+              "outcome": "a new Organization is persisted with a system-generated UUID as its id, and a success response is returned"
+            },
+            {
+              "id": "REQ-007-AC-02",
+              "given": "a creation request that does not include a name",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request as invalid"
+            },
+            {
+              "id": "REQ-007-AC-03",
+              "given": "a creation request that does not include a slug",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request as invalid"
+            },
+            {
+              "id": "REQ-007-AC-04",
+              "given": "a creation request that includes a slug already held by a persisted Organization",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request to preserve slug uniqueness"
+            },
+            {
+              "id": "REQ-007-AC-05",
+              "given": "a creation request that includes a slug not matching the required lowercase-alphanumeric-hyphen format",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request as invalid"
+            },
+            {
+              "id": "REQ-007-AC-06",
+              "given": "a creation request that includes extra fields beyond name and slug",
+              "when": "the request is processed",
+              "outcome": "the persisted Organization contains only id, name, and slug; any additional fields are discarded"
+            }
+          ]
+        },
+        {
+          "id": "REQ-008",
+          "title": "Replace Organization endpoint",
+          "statement": "The system SHALL expose a REST endpoint that fully replaces an existing persisted Organization with a complete Organization record.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_58171069de9d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-008-AC-01",
+              "given": "an existing Organization and a replace request containing a complete Organization record including id, name, and slug",
+              "when": "the request is processed",
+              "outcome": "the stored Organization is fully replaced with the supplied record, and a success response is returned"
+            },
+            {
+              "id": "REQ-008-AC-02",
+              "given": "a replace request referencing an id that does not identify any persisted Organization",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request because the target Organization does not exist"
+            },
+            {
+              "id": "REQ-008-AC-03",
+              "given": "a replace request for an existing Organization where the request body is missing id, name, or slug",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request as invalid"
+            },
+            {
+              "id": "REQ-008-AC-04",
+              "given": "a replace request where the id in the request body does not match the targeted Organization's id",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request as invalid"
+            },
+            {
+              "id": "REQ-008-AC-05",
+              "given": "a replace request for an existing Organization that repeats the Organization's own current slug",
+              "when": "the request is processed",
+              "outcome": "the replacement succeeds and slug uniqueness is maintained"
+            },
+            {
+              "id": "REQ-008-AC-06",
+              "given": "a replace request for an existing Organization that specifies a slug already held by a different Organization",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request to preserve slug uniqueness"
+            },
+            {
+              "id": "REQ-008-AC-07",
+              "given": "a replace request for an existing Organization that includes a slug not matching the required lowercase-alphanumeric-hyphen format",
+              "when": "the request is processed",
+              "outcome": "the system rejects the request as invalid"
+            },
+            {
+              "id": "REQ-008-AC-08",
+              "given": "a replace request for an existing Organization that includes extra fields beyond id, name, and slug",
+              "when": "the request is processed",
+              "outcome": "the persisted Organization contains only id, name, and slug; any additional fields are discarded"
+            }
+          ]
+        },
+        {
+          "id": "REQ-009",
+          "title": "Organization UUID identifier generation",
+          "statement": "The system SHALL generate a UUID for the Organization id upon creation and SHALL NOT allow clients to supply or modify it.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_58171069de9d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-009-AC-01",
+              "given": "an Organization creation request",
+              "when": "the system persists the Organization",
+              "outcome": "the id value is a valid, system-generated UUID"
+            },
+            {
+              "id": "REQ-009-AC-02",
+              "given": "two independent Organization creation requests",
+              "when": "both Organizations are persisted",
+              "outcome": "each Organization is assigned a distinct id"
+            },
+            {
+              "id": "REQ-009-AC-03",
+              "given": "a creation request that includes a client-supplied id",
+              "when": "the request is processed",
+              "outcome": "the system ignores the supplied id and assigns its own UUID"
+            },
+            {
+              "id": "REQ-009-AC-04",
+              "given": "an existing Organization",
+              "when": "a replace request is processed",
+              "outcome": "the Organization's id remains unchanged from the value assigned at creation"
+            }
+          ]
+        },
+        {
+          "id": "REQ-010",
+          "title": "Slug uniqueness",
+          "statement": "The system SHALL enforce that the slug field is unique across all persisted Organizations for both creation and replacement operations.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_58171069de9d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-010-AC-01",
+              "given": "an Organization already exists with a specific slug",
+              "when": "a creation request specifies that same slug",
+              "outcome": "the system rejects the request"
+            },
+            {
+              "id": "REQ-010-AC-02",
+              "given": "an Organization already exists with a specific slug",
+              "when": "a replace request for a different Organization specifies that same slug",
+              "outcome": "the system rejects the request"
+            },
+            {
+              "id": "REQ-010-AC-03",
+              "given": "an Organization already exists with a specific slug",
+              "when": "a replace request for that same Organization repeats the current slug",
+              "outcome": "the replacement succeeds and uniqueness is maintained"
+            },
+            {
+              "id": "REQ-010-AC-04",
+              "given": "no persisted Organization has a specific slug",
+              "when": "a creation or replace request specifies that slug",
+              "outcome": "the operation succeeds and the new slug is stored"
+            }
+          ]
+        },
+        {
+          "id": "REQ-011",
+          "title": "Organization representation",
+          "statement": "The system SHALL represent an Organization with exactly the fields id, name, and slug, and SHALL NOT persist additional fields supplied by clients.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_58171069de9d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-011-AC-01",
+              "given": "any persisted Organization",
+              "when": "the record is inspected",
+              "outcome": "it contains exactly the fields id, name, and slug"
+            },
+            {
+              "id": "REQ-011-AC-02",
+              "given": "an Organization has been created or replaced",
+              "when": "the persisted record is retrieved",
+              "outcome": "no extra computed or metadata fields are present beyond id, name, and slug"
+            }
+          ]
+        },
+        {
+          "id": "REQ-012",
+          "title": "Organization in-memory persistence",
+          "statement": "The system SHALL use an in-memory store for all Organization persistence.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_58171069de9d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-012-AC-01",
+              "given": "an Organization has been persisted",
+              "when": "the running process serves subsequent requests",
+              "outcome": "the Organization record remains available and can be replaced within the same process instance"
+            },
+            {
+              "id": "REQ-012-AC-02",
+              "given": "an Organization has been persisted",
+              "when": "the process is restarted",
+              "outcome": "the previously persisted Organization records are no longer present"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Building Management",
+      "summary": "Capabilities for creating, retrieving, updating, deleting, and listing Building resources with unique identifiers, name and address fields, and cursor-based pagination over a transient in-memory store.",
+      "requirements": [
+        {
+          "id": "REQ-013",
+          "title": "Create Building endpoint",
+          "statement": "The system SHALL expose a REST API endpoint to create an office building from a name and an address.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_f9ddcd7bf123"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-013-AC-01",
+              "given": "a creation request containing a name not exceeding 80 characters and an address not exceeding 160 characters",
+              "when": "the request is processed",
+              "outcome": "the system stores the Building with a unique identifier and returns the Building record"
+            },
+            {
+              "id": "REQ-013-AC-02",
+              "given": "a creation request containing a name exceeding 80 characters",
+              "when": "the request is processed",
+              "outcome": "the system performs basic error handling and does not create the Building"
+            },
+            {
+              "id": "REQ-013-AC-03",
+              "given": "a creation request containing an address exceeding 160 characters",
+              "when": "the request is processed",
+              "outcome": "the system performs basic error handling and does not create the Building"
+            },
+            {
+              "id": "REQ-013-AC-04",
+              "given": "a creation request containing a missing name or address",
+              "when": "the request is processed",
+              "outcome": "the system performs basic error handling and does not create the Building"
+            }
+          ]
+        },
+        {
+          "id": "REQ-014",
+          "title": "Retrieve Building endpoint",
+          "statement": "The system SHALL expose a REST API endpoint to retrieve an office building by its unique identifier.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_f9ddcd7bf123"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-014-AC-01",
+              "given": "a Building exists for the provided identifier",
+              "when": "the request is processed",
+              "outcome": "the system returns the Building record"
+            },
+            {
+              "id": "REQ-014-AC-02",
+              "given": "no Building exists for the provided identifier",
+              "when": "the request is processed",
+              "outcome": "the system performs basic error handling"
+            }
+          ]
+        },
+        {
+          "id": "REQ-015",
+          "title": "Update Building endpoint",
+          "statement": "The system SHALL expose a REST API endpoint to update an existing office building.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_f9ddcd7bf123"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-015-AC-01",
+              "given": "a stored Building and a request containing a name not exceeding 80 characters and an address not exceeding 160 characters",
+              "when": "the request is processed",
+              "outcome": "the system modifies the record and returns the updated Building"
+            },
+            {
+              "id": "REQ-015-AC-02",
+              "given": "no Building exists for the provided identifier",
+              "when": "an update request is processed",
+              "outcome": "the system performs basic error handling"
+            },
+            {
+              "id": "REQ-015-AC-03",
+              "given": "an update request containing a name exceeding 80 characters",
+              "when": "the request is processed",
+              "outcome": "the system performs basic error handling and does not modify the Building"
+            },
+            {
+              "id": "REQ-015-AC-04",
+              "given": "an update request containing an address exceeding 160 characters",
+              "when": "the request is processed",
+              "outcome": "the system performs basic error handling and does not modify the Building"
+            }
+          ]
+        },
+        {
+          "id": "REQ-016",
+          "title": "Delete Building endpoint",
+          "statement": "The system SHALL expose a REST API endpoint to permanently delete an office building by its unique identifier.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_f9ddcd7bf123"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-016-AC-01",
+              "given": "a stored Building",
+              "when": "a delete request is processed",
+              "outcome": "the system permanently removes the record from the in-memory store"
+            },
+            {
+              "id": "REQ-016-AC-02",
+              "given": "no Building exists for the provided identifier",
+              "when": "a delete request is processed",
+              "outcome": "the system performs basic error handling"
+            }
+          ]
+        },
+        {
+          "id": "REQ-017",
+          "title": "List Buildings endpoint",
+          "statement": "The system SHALL expose a REST API endpoint to list office buildings with cursor-based pagination.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_f9ddcd7bf123"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-017-AC-01",
+              "given": "zero stored buildings",
+              "when": "the list endpoint is invoked",
+              "outcome": "the system returns a paginated collection with no items"
+            },
+            {
+              "id": "REQ-017-AC-02",
+              "given": "fewer buildings than the page size",
+              "when": "the list endpoint is invoked",
+              "outcome": "the system returns all buildings and a pagination response indicating no next cursor"
+            },
+            {
+              "id": "REQ-017-AC-03",
+              "given": "more buildings than the page size",
+              "when": "the list endpoint is invoked with a page size parameter",
+              "outcome": "the system returns a single page of buildings and a next cursor for retrieving subsequent buildings"
+            },
+            {
+              "id": "REQ-017-AC-04",
+              "given": "a valid next cursor from a previous list response",
+              "when": "the list endpoint is invoked with that cursor",
+              "outcome": "the system returns the next page of buildings"
+            }
+          ]
+        },
+        {
+          "id": "REQ-018",
+          "title": "Building representation",
+          "statement": "The system SHALL represent a Building with exactly the fields id, name, and address, and SHALL NOT persist additional fields supplied by clients.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_f9ddcd7bf123"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-018-AC-01",
+              "given": "any persisted Building",
+              "when": "the record is inspected",
+              "outcome": "it contains exactly the fields id, name, and address"
+            }
+          ]
+        },
+        {
+          "id": "REQ-019",
+          "title": "Building in-memory persistence",
+          "statement": "The system SHALL store all Building data in memory only, without disk persistence, snapshotting, or file-based survival, and SHALL initialize the store empty on startup.",
+          "kind": "nonfunctional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_f9ddcd7bf123"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-019-AC-01",
+              "given": "a Building has been persisted",
+              "when": "the process is restarted",
+              "outcome": "no Building data from the previous process lifecycle remains"
+            },
+            {
+              "id": "REQ-019-AC-02",
+              "given": "the service has just started",
+              "when": "the Building store is inspected",
+              "outcome": "the store contains no seed data"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Car Management",
+      "summary": "Capabilities for typical CRUD operations on Car resources using a transient in-memory store.",
+      "requirements": [
+        {
+          "id": "REQ-020",
+          "title": "Car CRUD endpoints",
+          "statement": "The system SHALL expose REST endpoints to create, retrieve, list, update, and delete Car resources, using an in-memory store.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_1ae9bb19c6a1"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-020-AC-01",
+              "given": "a valid create request for a Car",
+              "when": "the request is processed",
+              "outcome": "the Car is persisted with a system-generated unique identifier and returned"
+            },
+            {
+              "id": "REQ-020-AC-02",
+              "given": "a stored Car and a valid identifier",
+              "when": "the retrieve request is processed",
+              "outcome": "the system returns the Car record"
+            },
+            {
+              "id": "REQ-020-AC-03",
+              "given": "a Car identifier that does not exist",
+              "when": "the retrieve request is processed",
+              "outcome": "the system performs error handling indicating the resource was not found"
+            },
+            {
+              "id": "REQ-020-AC-04",
+              "given": "one or more stored Cars and a list request",
+              "when": "the request is processed",
+              "outcome": "the system returns a collection of Car records with cursor-based pagination"
+            },
+            {
+              "id": "REQ-020-AC-05",
+              "given": "a stored Car and a valid full-update request",
+              "when": "the request is processed",
+              "outcome": "the system replaces the stored Car fields and returns the updated record"
+            },
+            {
+              "id": "REQ-020-AC-06",
+              "given": "a non-existent Car identifier on update",
+              "when": "the request is processed",
+              "outcome": "the system performs error handling indicating the resource was not found"
+            },
+            {
+              "id": "REQ-020-AC-07",
+              "given": "a stored Car identifier",
+              "when": "the delete request is processed",
+              "outcome": "the system permanently removes the Car from the in-memory store"
+            },
+            {
+              "id": "REQ-020-AC-08",
+              "given": "a non-existent Car identifier on delete",
+              "when": "the request is processed",
+              "outcome": "the system performs error handling indicating the resource was not found"
+            }
+          ]
+        },
+        {
+          "id": "REQ-021",
+          "title": "Car identifier and representation",
+          "statement": "The system SHALL generate a unique identifier for each Car upon creation and represent a Car with a fixed set of fields.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_1ae9bb19c6a1"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-021-AC-01",
+              "given": "a Car creation request",
+              "when": "the Car is persisted",
+              "outcome": "the id value is a valid, system-generated identifier"
+            },
+            {
+              "id": "REQ-021-AC-02",
+              "given": "two independent Car creation requests",
+              "when": "both Cars are persisted",
+              "outcome": "each Car is assigned a distinct id"
+            },
+            {
+              "id": "REQ-021-AC-03",
+              "given": "any persisted Car",
+              "when": "the record is inspected",
+              "outcome": "it contains the expected fixed fields and no extra computed fields"
+            }
+          ]
+        },
+        {
+          "id": "REQ-022",
+          "title": "Car in-memory persistence",
+          "statement": "The system SHALL persist all Car data in memory only, with an empty store on startup and no data survival across restarts.",
+          "kind": "nonfunctional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_1ae9bb19c6a1"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-022-AC-01",
+              "given": "a Car has been persisted",
+              "when": "the process is restarted",
+              "outcome": "no Car data from the previous process lifecycle remains"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bicycle Management",
+      "summary": "Capabilities for typical CRUD operations on Bicycle resources using a transient in-memory store.",
+      "requirements": [
+        {
+          "id": "REQ-023",
+          "title": "Bicycle CRUD endpoints",
+          "statement": "The system SHALL expose REST endpoints to create, retrieve, list, update, and delete Bicycle resources, using an in-memory store.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_4813ef30164d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-023-AC-01",
+              "given": "a valid create request for a Bicycle",
+              "when": "the request is processed",
+              "outcome": "the Bicycle is persisted with a system-generated unique identifier and returned"
+            },
+            {
+              "id": "REQ-023-AC-02",
+              "given": "a stored Bicycle and a valid identifier",
+              "when": "the retrieve request is processed",
+              "outcome": "the system returns the Bicycle record"
+            },
+            {
+              "id": "REQ-023-AC-03",
+              "given": "a Bicycle identifier that does not exist",
+              "when": "the retrieve request is processed",
+              "outcome": "the system performs error handling indicating the resource was not found"
+            },
+            {
+              "id": "REQ-023-AC-04",
+              "given": "one or more stored Bicycles and a list request",
+              "when": "the request is processed",
+              "outcome": "the system returns a collection of Bicycle records with cursor-based pagination"
+            },
+            {
+              "id": "REQ-023-AC-05",
+              "given": "a stored Bicycle and a valid full-update request",
+              "when": "the request is processed",
+              "outcome": "the system replaces the stored Bicycle fields and returns the updated record"
+            },
+            {
+              "id": "REQ-023-AC-06",
+              "given": "a non-existent Bicycle identifier on update",
+              "when": "the request is processed",
+              "outcome": "the system performs error handling indicating the resource was not found"
+            },
+            {
+              "id": "REQ-023-AC-07",
+              "given": "a stored Bicycle identifier",
+              "when": "the delete request is processed",
+              "outcome": "the system permanently removes the Bicycle from the in-memory store"
+            },
+            {
+              "id": "REQ-023-AC-08",
+              "given": "a non-existent Bicycle identifier on delete",
+              "when": "the request is processed",
+              "outcome": "the system performs error handling indicating the resource was not found"
+            }
+          ]
+        },
+        {
+          "id": "REQ-024",
+          "title": "Bicycle identifier and representation",
+          "statement": "The system SHALL generate a unique identifier for each Bicycle upon creation and represent a Bicycle with a fixed set of fields.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_4813ef30164d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-024-AC-01",
+              "given": "a Bicycle creation request",
+              "when": "the Bicycle is persisted",
+              "outcome": "the id value is a valid, system-generated identifier"
+            },
+            {
+              "id": "REQ-024-AC-02",
+              "given": "two independent Bicycle creation requests",
+              "when": "both Bicycles are persisted",
+              "outcome": "each Bicycle is assigned a distinct id"
+            },
+            {
+              "id": "REQ-024-AC-03",
+              "given": "any persisted Bicycle",
+              "when": "the record is inspected",
+              "outcome": "it contains the expected fixed fields and no extra computed fields"
+            }
+          ]
+        },
+        {
+          "id": "REQ-025",
+          "title": "Bicycle in-memory persistence",
+          "statement": "The system SHALL persist all Bicycle data in memory only, with an empty store on startup and no data survival across restarts.",
+          "kind": "nonfunctional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_4813ef30164d"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-025-AC-01",
+              "given": "a Bicycle has been persisted",
+              "when": "the process is restarted",
+              "outcome": "no Bicycle data from the previous process lifecycle remains"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Office Table Management",
+      "summary": "Capabilities for creating, retrieving, listing, updating, and deleting physical office furniture (office table) resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.",
+      "requirements": [
+        {
+          "id": "REQ-026",
+          "title": "Office Table CRUD endpoints",
+          "statement": "The system SHALL expose REST endpoints for Create, Read, Update, and Delete operations on office table resources; exact URL paths SHALL be determined at implementation time.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-026-AC-01",
+              "given": "the service is running",
+              "when": "its API is inspected",
+              "outcome": "it exposes RESTful endpoints supporting all CRUD operations for office tables"
+            }
+          ]
+        },
+        {
+          "id": "REQ-027",
+          "title": "Office Table representation",
+          "statement": "The system SHALL represent each office table resource with the fields id, price, and date bought, generating id as a UUIDv7 upon creation.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-027-AC-01",
+              "given": "a request to create an office table",
+              "when": "the resource is created",
+              "outcome": "the system assigns a UUIDv7 identifier and stores the provided price and date bought"
+            },
+            {
+              "id": "REQ-027-AC-02",
+              "given": "any stored office table",
+              "when": "retrieved",
+              "outcome": "its JSON representation contains id, price, and date bought"
+            },
+            {
+              "id": "REQ-027-AC-03",
+              "given": "a creation request that includes a client-supplied id",
+              "when": "the request is processed",
+              "outcome": "the system ignores the supplied id and assigns its own UUIDv7 identifier"
+            }
+          ]
+        },
+        {
+          "id": "REQ-028",
+          "title": "Office Table price validation",
+          "statement": "The system SHALL reject any create or update request that specifies a negative price.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-028-AC-01",
+              "given": "a request payload with a negative price",
+              "when": "the create endpoint processes the request",
+              "outcome": "the system returns an HTTP status code consistent with common REST conventions indicating a client validation error and does not persist the invalid resource"
+            },
+            {
+              "id": "REQ-028-AC-02",
+              "given": "a request payload with a negative price for an existing office table",
+              "when": "the update endpoint processes the request",
+              "outcome": "the system returns an HTTP status code consistent with common REST conventions indicating a client validation error and does not persist the invalid resource"
+            },
+            {
+              "id": "REQ-028-AC-03",
+              "given": "a request payload with a zero price",
+              "when": "the create or update endpoint processes the request",
+              "outcome": "the operation succeeds because zero is a non-negative price"
+            }
+          ]
+        },
+        {
+          "id": "REQ-029",
+          "title": "Retrieve Office Table endpoint",
+          "statement": "The system SHALL provide an endpoint to retrieve a single office table by its UUIDv7 identifier.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-029-AC-01",
+              "given": "an existing office table UUIDv7 identifier",
+              "when": "the retrieve endpoint is invoked",
+              "outcome": "the system returns the resource directly as JSON with an HTTP status code consistent with common REST conventions for a successful retrieval"
+            },
+            {
+              "id": "REQ-029-AC-02",
+              "given": "a non-existent UUIDv7 identifier",
+              "when": "the retrieve endpoint is invoked",
+              "outcome": "the system returns an HTTP status code consistent with common REST conventions indicating the resource was not found"
+            }
+          ]
+        },
+        {
+          "id": "REQ-030",
+          "title": "List Office Tables endpoint",
+          "statement": "The system SHALL provide an endpoint to list office tables with cursor-based pagination.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-030-AC-01",
+              "given": "multiple office tables exist in the store",
+              "when": "the list endpoint is invoked",
+              "outcome": "the system returns a paginated collection directly as JSON using cursor-based pagination"
+            }
+          ]
+        },
+        {
+          "id": "REQ-031",
+          "title": "Office Table full replacement update",
+          "statement": "The system SHALL support only full resource replacement for updates.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-031-AC-01",
+              "given": "an existing office table",
+              "when": "an update request is received with a payload",
+              "outcome": "the system replaces all stored fields with the payload contents and returns the updated resource"
+            }
+          ]
+        },
+        {
+          "id": "REQ-032",
+          "title": "Direct JSON payloads",
+          "statement": "The system SHALL return resource and collection payloads directly as JSON without an envelope wrapper, using HTTP status codes consistent with common REST conventions.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-032-AC-01",
+              "given": "any successful CRUD operation for office tables",
+              "when": "the response is returned",
+              "outcome": "the body contains the resource or collection directly without a data envelope"
+            }
+          ]
+        },
+        {
+          "id": "REQ-033",
+          "title": "Office Table in-memory persistence",
+          "statement": "The system SHALL persist office table resources in a fully ephemeral in-memory store that is cleared on service restart.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-033-AC-01",
+              "given": "the service has stored office tables",
+              "when": "the service process restarts",
+              "outcome": "no office table data from the previous process lifecycle remains"
+            }
+          ]
+        },
+        {
+          "id": "REQ-034",
+          "title": "No API version prefixes",
+          "statement": "The system SHALL NOT include API version prefixes in endpoint URLs.",
+          "kind": "functional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-034-AC-01",
+              "given": "any endpoint URL for office tables",
+              "when": "inspected",
+              "outcome": "it does not contain a version path segment such as /v1/"
+            }
+          ]
+        },
+        {
+          "id": "REQ-035",
+          "title": "Office Table REST interface conventions",
+          "statement": "The system SHALL expose a REST interface for office tables following common HTTP and REST conventions.",
+          "kind": "nonfunctional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-035-AC-01",
+              "given": "a valid request to an office table endpoint using the HTTP method associated with the requested operation",
+              "when": "the request is processed",
+              "outcome": "the response uses an HTTP status code consistent with common REST conventions for that operation"
+            },
+            {
+              "id": "REQ-035-AC-02",
+              "given": "a request to an office table endpoint using an HTTP method not supported by that endpoint",
+              "when": "the request is processed",
+              "outcome": "the response uses an HTTP status code consistent with common REST conventions indicating the method is not allowed"
+            },
+            {
+              "id": "REQ-035-AC-03",
+              "given": "an invalid request payload for an office table create or update operation",
+              "when": "the request is processed",
+              "outcome": "the response uses an HTTP status code consistent with common REST conventions indicating a client validation error"
+            }
+          ]
+        },
+        {
+          "id": "REQ-036",
+          "title": "Office Table in-memory response times",
+          "statement": "The system SHALL use an in-memory store with response times characteristic of in-memory data access for all Office Table CRUD operations.",
+          "kind": "nonfunctional",
+          "priority": "must",
+          "sourceBlockIds": [
+            "task_74f863ac61b8"
+          ],
+          "acceptance": [
+            {
+              "id": "REQ-036-AC-01",
+              "given": "the in-memory store contains office table data",
+              "when": "any CRUD operation is performed",
+              "outcome": "the operation completes without disk I/O or durable storage access"
+            },
+            {
+              "id": "REQ-036-AC-02",
+              "given": "the service is processing office table requests",
+              "when": "response times are observed",
+              "outcome": "CRUD operations complete within a timeframe characteristic of in-memory data access"
+            }
+          ]
+        }
+      ]
     }
   ],
   "rules": [
@@ -548,6 +1466,158 @@
       "rationale": "Matches the explicit in-memory store requirement and sets clear durability expectations.",
       "sourceBlockIds": [
         "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-013",
+      "rule": "An Organization id is immutable and is system-assigned as a UUID at creation time.",
+      "rationale": "Guarantees unique identity without requiring client coordination and prevents identity spoofing or alteration.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-014",
+      "rule": "The slug field acts as a unique key across the entire Organization population and must match the lowercase-alphanumeric-hyphen pattern.",
+      "rationale": "Provides a human-readable unique identifier while preventing ambiguous or malformed slugs.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-015",
+      "rule": "Replacement of an Organization is a full-record operation requiring id, name, and slug; partial updates are not permitted.",
+      "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-016",
+      "rule": "An Organization entity has exactly the fields id, name, and slug.",
+      "rationale": "Keeps the domain model minimal and predictable for clients.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-017",
+      "rule": "Organization data persists only in memory for the lifetime of the process; no durable storage or cross-process replication is provided.",
+      "rationale": "Matches the explicit in-memory store requirement and sets clear durability expectations.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-018",
+      "rule": "A Building entity has exactly the fields id, name, and address.",
+      "rationale": "Schema defined by the product owner.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-019",
+      "rule": "A Building name must not exceed 80 characters and a Building address must not exceed 160 characters.",
+      "rationale": "Input validation rules provided by the product owner.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-020",
+      "rule": "No uniqueness constraints apply to the Building name or address fields.",
+      "rationale": "The product owner stated there are no uniqueness constraints beyond the identifier.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-021",
+      "rule": "Deletion of a Building permanently removes it from the in-memory store.",
+      "rationale": "The product owner specified hard delete.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-022",
+      "rule": "Building data persists only in memory for the lifetime of the process.",
+      "rationale": "The product owner specified fully transient data.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-023",
+      "rule": "A Car entity has a fixed set of fields and a system-generated unique identifier, and persists only in memory for the lifetime of the process.",
+      "rationale": "Ensures a predictable transient model for simple CRUD.",
+      "sourceBlockIds": [
+        "task_1ae9bb19c6a1"
+      ]
+    },
+    {
+      "id": "RULE-024",
+      "rule": "A Bicycle entity has a fixed set of fields and a system-generated unique identifier, and persists only in memory for the lifetime of the process.",
+      "rationale": "Ensures a predictable transient model for simple CRUD.",
+      "sourceBlockIds": [
+        "task_4813ef30164d"
+      ]
+    },
+    {
+      "id": "RULE-025",
+      "rule": "An Office Table id is an immutable UUIDv7 generated by the system at resource creation; client-provided ids are not accepted.",
+      "rationale": "Provides time-ordered, globally unique identifiers while preventing identity spoofing.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-026",
+      "rule": "An Office Table price must be non-negative for every persisted resource.",
+      "rationale": "Prevents invalid financial values for furniture records.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-027",
+      "rule": "An Office Table entity has exactly the fields id, price, and date bought.",
+      "rationale": "Keeps the furniture resource model minimal and predictable for clients.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-028",
+      "rule": "Replacement of an Office Table is a full replacement of all stored fields; partial updates via PATCH are prohibited.",
+      "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-029",
+      "rule": "Office Table data persists only in memory for the lifetime of the process.",
+      "rationale": "Matches the explicit fully ephemeral in-memory store requirement.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-030",
+      "rule": "Office Table endpoint URLs SHALL NOT contain API version path segments.",
+      "rationale": "The product owner specified no API version prefixes.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-031",
+      "rule": "An office table is a physical furniture item; the data model and business logic apply to furniture, not database tables or abstract entities.",
+      "rationale": "Clarifies the domain scope so that the resource is interpreted as office furniture rather than database tables or other abstract constructs.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
       ]
     }
   ]
