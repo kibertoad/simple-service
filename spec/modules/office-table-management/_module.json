@@ -1,0 +1,4 @@
+{
+  "name": "Office Table Management",
+  "summary": "Capabilities for creating, retrieving, listing, updating, and deleting physical office furniture (office table) resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes."
+}

@@ -1,4 +1,4 @@
-Feature: User Management
+Feature: User Management — User Management
   Capabilities for creating and fully replacing User resources with a fixed id/name/email schema, UUID generation, and email uniqueness enforced in an in-memory store.
 
   @must

@@ -1,4 +1,4 @@
-Feature: Car Management
+Feature: Car Management — Car Management
   Capabilities for typical CRUD operations on Car resources using a transient in-memory store.
 
   @must

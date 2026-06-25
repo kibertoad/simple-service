@@ -1,0 +1,4 @@
+{
+  "name": "Organization Management",
+  "summary": "Capabilities for creating and fully replacing Organization resources with a fixed id/name/slug schema, UUID generation, and slug uniqueness enforced in an in-memory store."
+}

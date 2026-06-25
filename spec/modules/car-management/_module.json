@@ -1,0 +1,4 @@
+{
+  "name": "Car Management",
+  "summary": "Capabilities for typical CRUD operations on Car resources using a transient in-memory store."
+}

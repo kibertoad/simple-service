@@ -1,4 +1,4 @@
-Feature: Organization Management
+Feature: Organization Management — Organization Management
   Capabilities for creating and fully replacing Organization resources with a fixed id/name/slug schema, UUID generation, and slug uniqueness enforced in an in-memory store.
 
   @must
@@ -125,7 +125,7 @@ Feature: Organization Management
   Scenario: Slug uniqueness (#3)
     Given an Organization already exists with a specific slug
     When a replace request for that same Organization repeats the current slug
-    Then the replacement succeeds and uniqueness is maintained
+    Then the replacement succeeds and slug uniqueness is maintained
 
   @must
   Scenario: Slug uniqueness (#4)

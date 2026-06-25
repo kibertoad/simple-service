@@ -1,0 +1,246 @@
+{
+  "name": "Building Management",
+  "summary": "Capabilities for creating, retrieving, updating, deleting, and listing Building resources with unique identifiers, name and address fields, and cursor-based pagination over a transient in-memory store.",
+  "requirements": [
+    {
+      "id": "REQ-013-2",
+      "title": "Create Building endpoint",
+      "statement": "The system SHALL expose a REST API endpoint to create an office building from a name and an address.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-013-AC-01-2",
+          "given": "a creation request containing a name not exceeding 80 characters and an address not exceeding 160 characters",
+          "when": "the request is processed",
+          "outcome": "the system stores the Building with a unique identifier and returns the Building record"
+        },
+        {
+          "id": "REQ-013-AC-02",
+          "given": "a creation request containing a name exceeding 80 characters",
+          "when": "the request is processed",
+          "outcome": "the system performs basic error handling and does not create the Building"
+        },
+        {
+          "id": "REQ-013-AC-03",
+          "given": "a creation request containing an address exceeding 160 characters",
+          "when": "the request is processed",
+          "outcome": "the system performs basic error handling and does not create the Building"
+        },
+        {
+          "id": "REQ-013-AC-04",
+          "given": "a creation request containing a missing name or address",
+          "when": "the request is processed",
+          "outcome": "the system performs basic error handling and does not create the Building"
+        }
+      ]
+    },
+    {
+      "id": "REQ-014-2",
+      "title": "Retrieve Building endpoint",
+      "statement": "The system SHALL expose a REST API endpoint to retrieve an office building by its unique identifier.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-014-AC-01-2",
+          "given": "a Building exists for the provided identifier",
+          "when": "the request is processed",
+          "outcome": "the system returns the Building record"
+        },
+        {
+          "id": "REQ-014-AC-02",
+          "given": "no Building exists for the provided identifier",
+          "when": "the request is processed",
+          "outcome": "the system performs basic error handling"
+        }
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "title": "Update Building endpoint",
+      "statement": "The system SHALL expose a REST API endpoint to update an existing office building.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-015-AC-01",
+          "given": "a stored Building and a request containing a name not exceeding 80 characters and an address not exceeding 160 characters",
+          "when": "the request is processed",
+          "outcome": "the system modifies the record and returns the updated Building"
+        },
+        {
+          "id": "REQ-015-AC-02",
+          "given": "no Building exists for the provided identifier",
+          "when": "an update request is processed",
+          "outcome": "the system performs basic error handling"
+        },
+        {
+          "id": "REQ-015-AC-03",
+          "given": "an update request containing a name exceeding 80 characters",
+          "when": "the request is processed",
+          "outcome": "the system performs basic error handling and does not modify the Building"
+        },
+        {
+          "id": "REQ-015-AC-04",
+          "given": "an update request containing an address exceeding 160 characters",
+          "when": "the request is processed",
+          "outcome": "the system performs basic error handling and does not modify the Building"
+        }
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "title": "Delete Building endpoint",
+      "statement": "The system SHALL expose a REST API endpoint to permanently delete an office building by its unique identifier.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-016-AC-01",
+          "given": "a stored Building",
+          "when": "a delete request is processed",
+          "outcome": "the system permanently removes the record from the in-memory store"
+        },
+        {
+          "id": "REQ-016-AC-02",
+          "given": "no Building exists for the provided identifier",
+          "when": "a delete request is processed",
+          "outcome": "the system performs basic error handling"
+        }
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "title": "List Buildings endpoint",
+      "statement": "The system SHALL expose a REST API endpoint to list office buildings with cursor-based pagination.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-017-AC-01",
+          "given": "zero stored buildings",
+          "when": "the list endpoint is invoked",
+          "outcome": "the system returns a paginated collection with no items"
+        },
+        {
+          "id": "REQ-017-AC-02",
+          "given": "fewer buildings than the page size",
+          "when": "the list endpoint is invoked",
+          "outcome": "the system returns all buildings and a pagination response indicating no next cursor"
+        },
+        {
+          "id": "REQ-017-AC-03",
+          "given": "more buildings than the page size",
+          "when": "the list endpoint is invoked with a page size parameter",
+          "outcome": "the system returns a single page of buildings and a next cursor for retrieving subsequent buildings"
+        },
+        {
+          "id": "REQ-017-AC-04",
+          "given": "a valid next cursor from a previous list response",
+          "when": "the list endpoint is invoked with that cursor",
+          "outcome": "the system returns the next page of buildings"
+        }
+      ]
+    },
+    {
+      "id": "REQ-018",
+      "title": "Building representation",
+      "statement": "The system SHALL represent a Building with exactly the fields id, name, and address, and SHALL NOT persist additional fields supplied by clients.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-018-AC-01",
+          "given": "any persisted Building",
+          "when": "the record is inspected",
+          "outcome": "it contains exactly the fields id, name, and address"
+        }
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "title": "Building in-memory persistence",
+      "statement": "The system SHALL store all Building data in memory only, without disk persistence, snapshotting, or file-based survival, and SHALL initialize the store empty on startup.",
+      "kind": "nonfunctional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-019-AC-01",
+          "given": "a Building has been persisted",
+          "when": "the process is restarted",
+          "outcome": "no Building data from the previous process lifecycle remains"
+        },
+        {
+          "id": "REQ-019-AC-02",
+          "given": "the service has just started",
+          "when": "the Building store is inspected",
+          "outcome": "the store contains no seed data"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE-018",
+      "rule": "A Building entity has exactly the fields id, name, and address.",
+      "rationale": "Schema defined by the product owner.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-019",
+      "rule": "A Building name must not exceed 80 characters and a Building address must not exceed 160 characters.",
+      "rationale": "Input validation rules provided by the product owner.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-020",
+      "rule": "No uniqueness constraints apply to the Building name or address fields.",
+      "rationale": "The product owner stated there are no uniqueness constraints beyond the identifier.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-021",
+      "rule": "Deletion of a Building permanently removes it from the in-memory store.",
+      "rationale": "The product owner specified hard delete.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    },
+    {
+      "id": "RULE-022",
+      "rule": "Building data persists only in memory for the lifetime of the process.",
+      "rationale": "The product owner specified fully transient data.",
+      "sourceBlockIds": [
+        "task_f9ddcd7bf123"
+      ]
+    }
+  ]
+}

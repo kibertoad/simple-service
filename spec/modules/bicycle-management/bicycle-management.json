@@ -1,0 +1,124 @@
+{
+  "name": "Bicycle Management",
+  "summary": "Capabilities for typical CRUD operations on Bicycle resources using a transient in-memory store.",
+  "requirements": [
+    {
+      "id": "REQ-023",
+      "title": "Bicycle CRUD endpoints",
+      "statement": "The system SHALL expose REST endpoints to create, retrieve, list, update, and delete Bicycle resources, using an in-memory store.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_4813ef30164d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-023-AC-01",
+          "given": "a valid create request for a Bicycle",
+          "when": "the request is processed",
+          "outcome": "the Bicycle is persisted with a system-generated unique identifier and returned"
+        },
+        {
+          "id": "REQ-023-AC-02",
+          "given": "a stored Bicycle and a valid identifier",
+          "when": "the retrieve request is processed",
+          "outcome": "the system returns the Bicycle record"
+        },
+        {
+          "id": "REQ-023-AC-03",
+          "given": "a Bicycle identifier that does not exist",
+          "when": "the retrieve request is processed",
+          "outcome": "the system performs error handling indicating the resource was not found"
+        },
+        {
+          "id": "REQ-023-AC-04",
+          "given": "one or more stored Bicycles and a list request",
+          "when": "the request is processed",
+          "outcome": "the system returns a collection of Bicycle records with cursor-based pagination"
+        },
+        {
+          "id": "REQ-023-AC-05",
+          "given": "a stored Bicycle and a valid full-update request",
+          "when": "the request is processed",
+          "outcome": "the system replaces the stored Bicycle fields and returns the updated record"
+        },
+        {
+          "id": "REQ-023-AC-06",
+          "given": "a non-existent Bicycle identifier on update",
+          "when": "the request is processed",
+          "outcome": "the system performs error handling indicating the resource was not found"
+        },
+        {
+          "id": "REQ-023-AC-07",
+          "given": "a stored Bicycle identifier",
+          "when": "the delete request is processed",
+          "outcome": "the system permanently removes the Bicycle from the in-memory store"
+        },
+        {
+          "id": "REQ-023-AC-08",
+          "given": "a non-existent Bicycle identifier on delete",
+          "when": "the request is processed",
+          "outcome": "the system performs error handling indicating the resource was not found"
+        }
+      ]
+    },
+    {
+      "id": "REQ-024",
+      "title": "Bicycle identifier and representation",
+      "statement": "The system SHALL generate a unique identifier for each Bicycle upon creation and represent a Bicycle with a fixed set of fields.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_4813ef30164d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-024-AC-01",
+          "given": "a Bicycle creation request",
+          "when": "the Bicycle is persisted",
+          "outcome": "the id value is a valid, system-generated identifier"
+        },
+        {
+          "id": "REQ-024-AC-02",
+          "given": "two independent Bicycle creation requests",
+          "when": "both Bicycles are persisted",
+          "outcome": "each Bicycle is assigned a distinct id"
+        },
+        {
+          "id": "REQ-024-AC-03",
+          "given": "any persisted Bicycle",
+          "when": "the record is inspected",
+          "outcome": "it contains the expected fixed fields and no extra computed fields"
+        }
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "title": "Bicycle in-memory persistence",
+      "statement": "The system SHALL persist all Bicycle data in memory only, with an empty store on startup and no data survival across restarts.",
+      "kind": "nonfunctional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_4813ef30164d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-025-AC-01",
+          "given": "a Bicycle has been persisted",
+          "when": "the process is restarted",
+          "outcome": "no Bicycle data from the previous process lifecycle remains"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE-024",
+      "rule": "A Bicycle entity has a fixed set of fields and a system-generated unique identifier, and persists only in memory for the lifetime of the process.",
+      "rationale": "Ensures a predictable transient model for simple CRUD.",
+      "sourceBlockIds": [
+        "task_4813ef30164d"
+      ]
+    }
+  ]
+}

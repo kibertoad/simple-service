@@ -1,5 +1,5 @@
-Feature: Office Table Management
-  Capabilities for creating, retrieving, listing, updating, and deleting Office Table resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.
+Feature: Office Table Management — Office Table Management
+  Capabilities for creating, retrieving, listing, updating, and deleting physical office furniture (office table) resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.
 
   @must
   Scenario: Office Table CRUD endpoints
@@ -84,3 +84,33 @@ Feature: Office Table Management
     Given any endpoint URL for office tables
     When inspected
     Then it does not contain a version path segment such as /v1/
+
+  @must
+  Scenario: Office Table REST interface conventions (#1)
+    Given a valid request to an office table endpoint using the HTTP method associated with the requested operation
+    When the request is processed
+    Then the response uses an HTTP status code consistent with common REST conventions for that operation
+
+  @must
+  Scenario: Office Table REST interface conventions (#2)
+    Given a request to an office table endpoint using an HTTP method not supported by that endpoint
+    When the request is processed
+    Then the response uses an HTTP status code consistent with common REST conventions indicating the method is not allowed
+
+  @must
+  Scenario: Office Table REST interface conventions (#3)
+    Given an invalid request payload for an office table create or update operation
+    When the request is processed
+    Then the response uses an HTTP status code consistent with common REST conventions indicating a client validation error
+
+  @must
+  Scenario: Office Table in-memory response times (#1)
+    Given the in-memory store contains office table data
+    When any CRUD operation is performed
+    Then the operation completes without disk I/O or durable storage access
+
+  @must
+  Scenario: Office Table in-memory response times (#2)
+    Given the service is processing office table requests
+    When response times are observed
+    Then CRUD operations complete within a timeframe characteristic of in-memory data access

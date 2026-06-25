@@ -1,4 +1,4 @@
-Feature: Bicycle Management
+Feature: Bicycle Management — Bicycle Management
   Capabilities for typical CRUD operations on Bicycle resources using a transient in-memory store.
 
   @must
