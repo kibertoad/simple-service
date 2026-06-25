@@ -1,29 +1,78 @@
 {
   "type": "service",
-  "name": "main-service",
-  "summary": "Core service handling application logic and module integration",
+  "name": "in-memory-resource-service",
+  "summary": "A transient, in-memory REST service managing multiple resource collections (Users, Organizations, Bears, Office Tables, Buildings, Cars, Bicycles) with system-generated identifiers, per-resource domain validation, and no persistence across process restarts.",
   "references": [
-    "/tmp/blueprint-Jv3j2E"
+    "/tmp/agent-explore-6BLLYc/src/app.js",
+    "/tmp/agent-explore-6BLLYc/src/index.js",
+    "/tmp/agent-explore-6BLLYc/package.json",
+    "/tmp/agent-explore-6BLLYc/spec/overview.md"
   ],
   "modules": [
     {
       "name": "user-management",
-      "summary": "Handles user authentication, profiles, and access control",
+      "summary": "Manages User resources: create and full-replace operations with system-generated UUID identifiers, name/email validation, and email uniqueness enforced in an in-memory store.",
       "references": [
-        "/tmp/blueprint-Jv3j2E/src/core/",
-        "/tmp/blueprint-Jv3j2E/modules/core/"
+        "/tmp/agent-explore-6BLLYc/src/domain/user.js",
+        "/tmp/agent-explore-6BLLYc/src/domain/user.test.js",
+        "/tmp/agent-explore-6BLLYc/src/service/userService.js",
+        "/tmp/agent-explore-6BLLYc/src/service/userService.test.js",
+        "/tmp/agent-explore-6BLLYc/src/store/userStore.js",
+        "/tmp/agent-explore-6BLLYc/src/routes/users.js",
+        "/tmp/agent-explore-6BLLYc/spec/features/user-management.feature"
+      ]
+    },
+    {
+      "name": "organization-management",
+      "summary": "Manages Organization resources with system-generated UUID identifiers, name/slug validation, and slug uniqueness enforced in an in-memory store.",
+      "references": [
+        "/tmp/agent-explore-6BLLYc/src/domain/organization.js",
+        "/tmp/agent-explore-6BLLYc/src/domain/organization.test.js",
+        "/tmp/agent-explore-6BLLYc/src/service/organizationService.js",
+        "/tmp/agent-explore-6BLLYc/src/service/organizationService.test.js",
+        "/tmp/agent-explore-6BLLYc/src/store/organizationStore.js",
+        "/tmp/agent-explore-6BLLYc/src/routes/organizations.js",
+        "/tmp/agent-explore-6BLLYc/spec/features/organization-management.feature"
+      ]
+    },
+    {
+      "name": "bear-crud",
+      "summary": "Manages Bear resources with full CRUD, UUIDv7 identifiers, name/age/colour validation, unique-name enforcement, and cursor-based pagination backed by in-memory storage.",
+      "references": [
+        "/tmp/agent-explore-6BLLYc/src/domain/bear.js",
+        "/tmp/agent-explore-6BLLYc/src/domain/bear.test.js",
+        "/tmp/agent-explore-6BLLYc/src/service/bearService.js",
+        "/tmp/agent-explore-6BLLYc/src/service/bearService.test.js",
+        "/tmp/agent-explore-6BLLYc/src/store/bearStore.js",
+        "/tmp/agent-explore-6BLLYc/src/store/bearStore.test.js",
+        "/tmp/agent-explore-6BLLYc/src/routes/bears.js",
+        "/tmp/agent-explore-6BLLYc/spec/features/bear-crud.feature"
+      ]
+    },
+    {
+      "name": "office-table-management",
+      "summary": "Manages Office Table resources with full CRUD, UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, and cursor-based pagination over an in-memory store.",
+      "references": [
+        "/tmp/agent-explore-6BLLYc/src/domain/officeTable.js",
+        "/tmp/agent-explore-6BLLYc/src/domain/officeTable.test.js",
+        "/tmp/agent-explore-6BLLYc/src/service/officeTableService.js",
+        "/tmp/agent-explore-6BLLYc/src/service/officeTableService.test.js",
+        "/tmp/agent-explore-6BLLYc/src/store/officeTable.js",
+        "/tmp/agent-explore-6BLLYc/src/routes/officeTables.js",
+        "/tmp/agent-explore-6BLLYc/spec/features/office-table-management.feature"
       ]
     },
     {
       "name": "infrastructure",
-      "summary": "Technical infrastructure and cross-cutting concerns",
+      "summary": "Technical infrastructure and cross-cutting concerns: Express application wiring, HTTP transport bootstrapping, global error handling, shared domain error types, and project build/deployment metadata.",
       "references": [
-        "/tmp/blueprint-Jv3j2E/src/api/",
-        "/tmp/blueprint-Jv3j2E/modules/api/",
-        "/tmp/blueprint-Jv3j2E/src/ui/",
-        "/tmp/blueprint-Jv3j2E/modules/ui/",
-        "/tmp/blueprint-Jv3j2E/src/utils/",
-        "/tmp/blueprint-Jv3j2E/modules/utils/"
+        "/tmp/agent-explore-6BLLYc/src/app.js",
+        "/tmp/agent-explore-6BLLYc/src/index.js",
+        "/tmp/agent-explore-6BLLYc/src/domain/errors.js",
+        "/tmp/agent-explore-6BLLYc/package.json",
+        "/tmp/agent-explore-6BLLYc/Dockerfile",
+        "/tmp/agent-explore-6BLLYc/docker-compose.yml",
+        "/tmp/agent-explore-6BLLYc/test/app.test.js"
       ]
     }
   ]
