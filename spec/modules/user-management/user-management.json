@@ -1,0 +1,264 @@
+{
+  "name": "User Management",
+  "summary": "Capabilities for creating and fully replacing User resources with a fixed id/name/email schema, UUID generation, and email uniqueness enforced in an in-memory store.",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "Create User endpoint",
+      "statement": "The system SHALL expose a REST endpoint that creates a User from a supplied name and email.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-001-AC-01",
+          "given": "a creation request containing valid values for name and email",
+          "when": "the request is processed",
+          "outcome": "a new User is persisted with a system-generated UUID as its id, and a success response is returned"
+        },
+        {
+          "id": "REQ-001-AC-02",
+          "given": "a creation request that does not include a name",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-001-AC-03",
+          "given": "a creation request that does not include an email",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-001-AC-04",
+          "given": "a creation request that includes an email already held by a persisted User",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request to preserve email uniqueness"
+        },
+        {
+          "id": "REQ-001-AC-05",
+          "given": "a creation request that includes extra fields beyond name and email",
+          "when": "the request is processed",
+          "outcome": "the persisted User contains only id, name, and email; any additional fields are discarded"
+        }
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "title": "Replace User endpoint",
+      "statement": "The system SHALL expose a REST endpoint that fully replaces an existing persisted User with a complete User record.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-002-AC-01",
+          "given": "an existing User and a replace request containing a complete User record including id, name, and email",
+          "when": "the request is processed",
+          "outcome": "the stored User is fully replaced with the supplied record, and a success response is returned"
+        },
+        {
+          "id": "REQ-002-AC-02",
+          "given": "a replace request referencing an id that does not identify any persisted User",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request because the target User does not exist"
+        },
+        {
+          "id": "REQ-002-AC-03",
+          "given": "a replace request for an existing User where the request body is missing name, email, or id",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-002-AC-04",
+          "given": "a replace request where the id in the request body does not match the targeted User's id",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-002-AC-05",
+          "given": "a replace request for an existing User that repeats the User's own current email",
+          "when": "the request is processed",
+          "outcome": "the replacement succeeds and the User remains uniquely represented"
+        },
+        {
+          "id": "REQ-002-AC-06",
+          "given": "a replace request for an existing User that specifies an email already held by a different User",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request to preserve email uniqueness"
+        },
+        {
+          "id": "REQ-002-AC-07",
+          "given": "a replace request for an existing User that includes extra fields beyond id, name, and email",
+          "when": "the request is processed",
+          "outcome": "the persisted User contains only id, name, and email; any additional fields are discarded"
+        }
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "title": "UUID identifier generation",
+      "statement": "The system SHALL generate a UUID for the User id upon creation and SHALL NOT allow clients to supply or modify it.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-003-AC-01",
+          "given": "a User creation request",
+          "when": "the system persists the User",
+          "outcome": "the id value is a valid, system-generated UUID"
+        },
+        {
+          "id": "REQ-003-AC-02",
+          "given": "two independent User creation requests",
+          "when": "both Users are persisted",
+          "outcome": "each User is assigned a distinct id"
+        },
+        {
+          "id": "REQ-003-AC-03",
+          "given": "a creation request that includes a client-supplied id",
+          "when": "the request is processed",
+          "outcome": "the system ignores the supplied id and assigns its own UUID"
+        },
+        {
+          "id": "REQ-003-AC-04",
+          "given": "an existing User",
+          "when": "a replace request is processed",
+          "outcome": "the User's id remains unchanged from the value assigned at creation"
+        }
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "title": "Email uniqueness",
+      "statement": "The system SHALL enforce that the email field is unique across all persisted Users for both creation and replacement operations.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-004-AC-01",
+          "given": "a User already exists with a specific email address",
+          "when": "a creation request specifies that same email",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-004-AC-02",
+          "given": "a User already exists with a specific email address",
+          "when": "a replace request for a different User specifies that same email",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-004-AC-03",
+          "given": "a User already exists with a specific email address",
+          "when": "a replace request for that same User repeats the current email",
+          "outcome": "the replacement succeeds and uniqueness is maintained"
+        },
+        {
+          "id": "REQ-004-AC-04",
+          "given": "no persisted User has a specific email address",
+          "when": "a creation or replace request specifies that email",
+          "outcome": "the operation succeeds and the new email is stored"
+        }
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "title": "User representation",
+      "statement": "The system SHALL represent a User with exactly the fields id, name, and email, and SHALL NOT persist additional fields supplied by clients.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-005-AC-01",
+          "given": "any persisted User",
+          "when": "the record is inspected",
+          "outcome": "it contains exactly the fields id, name, and email"
+        },
+        {
+          "id": "REQ-005-AC-02",
+          "given": "a User has been created or replaced",
+          "when": "the persisted record is retrieved",
+          "outcome": "no extra computed or metadata fields are present beyond id, name, and email"
+        }
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "title": "In-memory persistence",
+      "statement": "The system SHALL use an in-memory store for all User persistence.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-006-AC-01",
+          "given": "a User has been persisted",
+          "when": "the running process serves subsequent requests",
+          "outcome": "the User record remains available and can be replaced within the same process instance"
+        },
+        {
+          "id": "REQ-006-AC-02",
+          "given": "a User has been persisted",
+          "when": "the process is restarted",
+          "outcome": "the previously persisted User records are no longer present"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE-001",
+      "rule": "A User id is immutable and is system-assigned as a UUID at creation time.",
+      "rationale": "Guarantees unique identity without requiring client coordination and prevents identity spoofing or alteration.",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ]
+    },
+    {
+      "id": "RULE-002",
+      "rule": "The email address acts as a unique key across the entire user population.",
+      "rationale": "Prevents duplicate accounts and ambiguous identity lookups.",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ]
+    },
+    {
+      "id": "RULE-003",
+      "rule": "Replacement of a User is a full-record operation requiring id, name, and email; partial updates are not permitted.",
+      "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ]
+    },
+    {
+      "id": "RULE-004",
+      "rule": "A User entity has exactly the fields id, name, and email.",
+      "rationale": "Keeps the domain model minimal and predictable for clients.",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ]
+    },
+    {
+      "id": "RULE-005",
+      "rule": "User data persists only in memory for the lifetime of the process; no durable storage or cross-process replication is provided.",
+      "rationale": "Matches the explicit in-memory store requirement and sets clear durability expectations.",
+      "sourceBlockIds": [
+        "task_d2d8f3a2f3d4"
+      ]
+    }
+  ]
+}

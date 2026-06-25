@@ -1,0 +1,32 @@
+name: zizmor (informational, non-blocking)
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  zizmor-informational:
+    name: Zizmor security scan (informational, non-blocking)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: woodruffw/zizmor-action@v1.26.1
+        with:
+          args: --format sarif --output zizmor.sarif .github
+        continue-on-error: true
+
+      - name: Upload zizmor SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor
+        continue-on-error: true

@@ -1,0 +1,324 @@
+{
+  "name": "Security Scanning",
+  "summary": "Static security analysis of GitHub Actions workflow definitions using zizmor, surfaced via SARIF without blocking CI.",
+  "requirements": [
+    {
+      "id": "REQ-037",
+      "title": "Dedicated zizmor workflow file",
+      "statement": "The system SHALL add zizmor as a dedicated workflow file rather than as a job or step inside an existing CI workflow.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-037-AC-01",
+          "given": "the repository contains existing CI workflows",
+          "when": "zizmor is introduced",
+          "outcome": "it is defined in its own workflow file under .github/workflows/"
+        },
+        {
+          "id": "REQ-037-AC-02",
+          "given": "the new workflow file exists",
+          "when": "a developer reviews the repository workflows",
+          "outcome": "the zizmor workflow is clearly named and separate from build/test workflows"
+        }
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "title": "Non-blocking zizmor success",
+      "statement": "The system SHALL configure the zizmor workflow to always report success and never fail or block CI builds, regardless of any findings.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-038-AC-01",
+          "given": "zizmor detects security findings",
+          "when": "the workflow job completes",
+          "outcome": "the job exits with a success/green status"
+        },
+        {
+          "id": "REQ-038-AC-02",
+          "given": "a pull request is open",
+          "when": "the zizmor workflow reports findings",
+          "outcome": "the overall PR status remains green and the zizmor job does not block merging"
+        },
+        {
+          "id": "REQ-038-AC-03",
+          "given": "the scan step reports findings",
+          "when": "the workflow continues",
+          "outcome": "the SARIF upload step still runs so findings are reported"
+        }
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "title": "Official zizmor GitHub Action",
+      "statement": "The system SHALL install and invoke zizmor using the official zizmor GitHub Action at the most recent release tag available at the time of implementation.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-039-AC-01",
+          "given": "the workflow runs",
+          "when": "zizmor is set up",
+          "outcome": "it uses the official zizmor GitHub Action published by the zizmor maintainers at the most recent release tag available when the workflow is implemented"
+        },
+        {
+          "id": "REQ-039-AC-02",
+          "given": "the workflow definition",
+          "when": "reviewed",
+          "outcome": "zizmor is not installed via pip, cargo, pre-commit, or any other non-official-action method"
+        }
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "title": "Scan all workflow files",
+      "statement": "The system SHALL scan all GitHub Actions workflow files in the repository.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-040-AC-01",
+          "given": "the repository contains workflow files under .github/workflows/",
+          "when": "zizmor runs",
+          "outcome": "every YAML workflow file in that directory tree is scanned"
+        },
+        {
+          "id": "REQ-040-AC-02",
+          "given": "the repository contains reusable workflows or composite action definitions",
+          "when": "zizmor runs",
+          "outcome": "those files are also included in the scan scope"
+        }
+      ]
+    },
+    {
+      "id": "REQ-041",
+      "title": "Generate and upload SARIF report",
+      "statement": "The system SHALL generate and upload zizmor findings as a SARIF report so findings are visible through GitHub's security alerting interface.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-041-AC-01",
+          "given": "zizmor produces findings",
+          "when": "the workflow completes",
+          "outcome": "a SARIF file is generated and uploaded to GitHub"
+        },
+        {
+          "id": "REQ-041-AC-02",
+          "given": "the SARIF upload succeeds",
+          "when": "viewing the pull request checks or repository security tab",
+          "outcome": "zizmor findings are surfaced as security alerts or annotations"
+        }
+      ]
+    },
+    {
+      "id": "REQ-042",
+      "title": "Trigger on pull request events",
+      "statement": "The system SHALL trigger the zizmor workflow on pull request events.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-042-AC-01",
+          "given": "a pull request is opened, synchronized, or reopened",
+          "when": "the event occurs",
+          "outcome": "the zizmor workflow runs automatically"
+        },
+        {
+          "id": "REQ-042-AC-02",
+          "given": "a direct push to the default branch or any other non-PR event",
+          "when": "no pull request is involved",
+          "outcome": "the zizmor workflow does not run unless explicitly changed later"
+        }
+      ]
+    },
+    {
+      "id": "REQ-043",
+      "title": "Standard recommended permissions",
+      "statement": "The system SHALL apply the standard recommended zizmor action permissions, including any permissions required for SARIF upload.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-043-AC-01",
+          "given": "the workflow job definition",
+          "when": "reviewed",
+          "outcome": "its permissions block matches the official zizmor action's documented recommendations"
+        },
+        {
+          "id": "REQ-043-AC-02",
+          "given": "the workflow uploads SARIF",
+          "when": "it runs",
+          "outcome": "the GitHub token has sufficient rights to write security events"
+        }
+      ]
+    },
+    {
+      "id": "REQ-044",
+      "title": "Optional informational status check",
+      "statement": "The system SHALL treat the zizmor job as an optional, informational status check rather than a required check.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-044-AC-01",
+          "given": "branch protection rules are configured",
+          "when": "the zizmor job is evaluated",
+          "outcome": "it is not listed as a required status check"
+        },
+        {
+          "id": "REQ-044-AC-02",
+          "given": "the zizmor job appears in the PR checks list",
+          "when": "a contributor views it",
+          "outcome": "the job name or description clearly indicates it is informational and non-blocking"
+        }
+      ]
+    },
+    {
+      "id": "REQ-045",
+      "title": "Suppress rules or establish a baseline",
+      "statement": "The system MAY suppress specific zizmor rules or establish a baseline for existing findings based on maintainer judgement.",
+      "kind": "functional",
+      "priority": "could",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-045-AC-01",
+          "given": "existing workflows contain zizmor findings",
+          "when": "the team decides to reduce noise",
+          "outcome": "rules may be disabled or a baseline file may be created"
+        },
+        {
+          "id": "REQ-045-AC-02",
+          "given": "a suppression or baseline is added",
+          "when": "it is reviewed",
+          "outcome": "it includes a brief documented rationale"
+        }
+      ]
+    },
+    {
+      "id": "REQ-046",
+      "title": "Use most recent zizmor release tag",
+      "statement": "The system SHALL use the most recent release tag of the official zizmor GitHub Action available at the time of implementation rather than pinning to a specific SHA/digest.",
+      "kind": "nonfunctional",
+      "priority": "should",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-046-AC-01",
+          "given": "the workflow uses the official zizmor GitHub Action",
+          "when": "the action reference is reviewed",
+          "outcome": "it points to the most recent release tag available at implementation time rather than a SHA/digest"
+        }
+      ]
+    },
+    {
+      "id": "REQ-047",
+      "title": "Keep zizmor workflow simple",
+      "statement": "The system SHALL keep the zizmor workflow simple and avoid custom caching or dependency-pinning mechanisms.",
+      "kind": "nonfunctional",
+      "priority": "should",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-047-AC-01",
+          "given": "the zizmor workflow definition",
+          "when": "reviewed",
+          "outcome": "zizmor is invoked through the official action directly on a standard runner without custom caching or dependency-pinning mechanisms"
+        }
+      ]
+    },
+    {
+      "id": "REQ-048",
+      "title": "Discoverable findings via code-scanning interface",
+      "statement": "The system SHALL make zizmor findings discoverable through GitHub's native code-scanning interface via SARIF upload.",
+      "kind": "nonfunctional",
+      "priority": "should",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-048-AC-01",
+          "given": "zizmor findings exist",
+          "when": "the workflow uploads the SARIF report to GitHub",
+          "outcome": "the findings are visible in GitHub's native code-scanning interface"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE-032",
+      "rule": "The zizmor workflow must never cause a CI build or pull request to fail, even when security findings are present.",
+      "rationale": "The requirement explicitly states that builds must not fail if zizmor is not passing.",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ]
+    },
+    {
+      "id": "RULE-033",
+      "rule": "The zizmor workflow must be implemented as a dedicated workflow file, not embedded in existing CI workflows.",
+      "rationale": "The product owner specified a dedicated file to keep the security scan isolated and independently maintainable.",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ]
+    },
+    {
+      "id": "RULE-034",
+      "rule": "The workflow must run only on pull request events unless changed by future work.",
+      "rationale": "The product owner scoped the trigger to pull requests.",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ]
+    },
+    {
+      "id": "RULE-035",
+      "rule": "The workflow must use the official zizmor GitHub Action and follow its recommended permissions.",
+      "rationale": "This ensures supported behavior and appropriate token scoping for SARIF uploads.",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ]
+    },
+    {
+      "id": "RULE-036",
+      "rule": "The repository is public, so workflows triggered by pull_request events from forks receive a read-only GITHUB_TOKEN.",
+      "rationale": "This is a GitHub platform behavior for public repositories and affects how the SARIF upload step must be designed.",
+      "sourceBlockIds": [
+        "task_8596d8735bff"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "name": "Bicycle Management",
+  "summary": "Capabilities for typical CRUD operations on Bicycle resources using a transient in-memory store."
+}

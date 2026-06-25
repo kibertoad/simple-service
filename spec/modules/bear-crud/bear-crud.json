@@ -1,0 +1,286 @@
+{
+  "name": "Bear CRUD",
+  "summary": "Capabilities for creating, reading, listing, updating, and deleting Bear resources with id/name/age/colour schema, UUIDv7 generation, validation rules for name and age, freeform colour, and cursor-based pagination backed by in-memory storage.",
+  "requirements": [
+    {
+      "id": "REQ-007",
+      "title": "Create Bear",
+      "statement": "The system SHALL create a bear record from a client-provided name, age, and colour, assigning a service-generated UUIDv7 identifier and returning the complete record.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-007-AC-01",
+          "given": "a non-empty, unique name no longer than 100 characters that also satisfies applicable character/pattern restrictions, a non-negative integer age, and a freeform colour",
+          "when": "a create request is submitted",
+          "outcome": "the system stores the bear and returns the record including the generated UUIDv7 identifier"
+        },
+        {
+          "id": "REQ-007-AC-02",
+          "given": "a create request with an empty name",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-007-AC-03",
+          "given": "a create request with a name that exceeds 100 characters",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-007-AC-04",
+          "given": "a create request with a name that duplicates an existing bear name",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-007-AC-05",
+          "given": "a create request with a name that violates applicable character/pattern restrictions",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-007-AC-06",
+          "given": "a create request with a negative age",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-007-AC-07",
+          "given": "a create request with an age that is not an integer",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the request"
+        }
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "title": "Read Bear",
+      "statement": "The system SHALL retrieve a single bear by its UUIDv7 identifier.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-008-AC-01",
+          "given": "a bear exists with a known UUIDv7 identifier",
+          "when": "a read request is made for that identifier",
+          "outcome": "the system returns the corresponding bear record"
+        },
+        {
+          "id": "REQ-008-AC-02",
+          "given": "a read request for a UUIDv7 identifier that does not exist",
+          "when": "the request is made",
+          "outcome": "the system indicates that the bear was not found"
+        }
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "title": "List Bears",
+      "statement": "The system SHALL list all stored bears using cursor-based pagination.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-009-AC-01",
+          "given": "one or more bears exist in storage",
+          "when": "a list request is made",
+          "outcome": "the system returns a paginated result set using cursor-based pagination"
+        },
+        {
+          "id": "REQ-009-AC-02",
+          "given": "no bears exist",
+          "when": "a list request is made",
+          "outcome": "the system returns an empty paginated result set"
+        }
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "title": "Update Bear",
+      "statement": "The system SHALL update an existing bear, identified by UUIDv7, by fully replacing its mutable fields (name, age, colour).",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-010-AC-01",
+          "given": "an existing bear and a replacement representation that satisfies all creation validation rules",
+          "when": "an update request is submitted",
+          "outcome": "the system overwrites the bear's mutable fields and returns the updated record"
+        },
+        {
+          "id": "REQ-010-AC-02",
+          "given": "an update request with an invalid age",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the update"
+        },
+        {
+          "id": "REQ-010-AC-03",
+          "given": "an update request with a duplicate name",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the update"
+        },
+        {
+          "id": "REQ-010-AC-04",
+          "given": "an update request with an empty name",
+          "when": "the request is submitted",
+          "outcome": "the system rejects the update"
+        },
+        {
+          "id": "REQ-010-AC-05",
+          "given": "an update request that omits one or more mutable fields",
+          "when": "the request is submitted",
+          "outcome": "the system applies full replacement semantics and stores exactly the provided values"
+        }
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "title": "Delete Bear",
+      "statement": "The system SHALL delete a bear by its UUIDv7 identifier.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-011-AC-01",
+          "given": "an existing bear",
+          "when": "a delete request is made by identifier",
+          "outcome": "the system removes the bear from storage"
+        },
+        {
+          "id": "REQ-011-AC-02",
+          "given": "a delete request for a UUIDv7 identifier that does not exist",
+          "when": "the request is made",
+          "outcome": "the system indicates that the bear was not found"
+        }
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "title": "Bear in-memory persistence",
+      "statement": "The system SHALL retain all bear records in volatile, in-memory storage with no persistence across process restarts.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-012-AC-01",
+          "given": "bears have been created in the service",
+          "when": "the service process restarts",
+          "outcome": "no bear records remain"
+        }
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "title": "In-memory operation latency",
+      "statement": "The system SHALL process all CRUD operations with latency consistent with in-memory data access and without reliance on external persistence services.",
+      "kind": "functional",
+      "priority": "should",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-013-AC-01",
+          "given": "bear CRUD operations are executed",
+          "when": "the system processes them",
+          "outcome": "responses are produced without reliance on external persistence services and with latency consistent with in-memory access"
+        }
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "title": "Local UUIDv7 generation",
+      "statement": "The system SHALL generate UUIDv7 identifiers using only local runtime capabilities.",
+      "kind": "functional",
+      "priority": "should",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-014-AC-01",
+          "given": "the service generates a bear identifier",
+          "when": "identifier generation occurs",
+          "outcome": "the identifier is produced using only local runtime capabilities without depending on external network services"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE-006",
+      "rule": "A Bear id is immutable and is system-assigned as a UUIDv7 value at creation time; clients cannot supply or modify it.",
+      "rationale": "Guarantees unique, ordered identity without client coordination and prevents identity spoofing or alteration.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-007",
+      "rule": "A Bear name acts as a unique key across the entire bear collection.",
+      "rationale": "Prevents duplicate bear records and ambiguous identification.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-008",
+      "rule": "A Bear age is strictly a non-negative integer; fractional or negative values are prohibited.",
+      "rationale": "Ensures age is stored as a valid whole number that represents a meaningful duration.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-009",
+      "rule": "A Bear name must be non-empty, must not exceed 100 characters, and is subject to additional applicable character/pattern restrictions.",
+      "rationale": "Maintains data quality and consistent naming constraints.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-010",
+      "rule": "A Bear colour is freeform text with no predefined enumeration, format, or length constraint.",
+      "rationale": "Allows clients to capture colour values flexibly without constraining the domain model.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-011",
+      "rule": "Bear updates use full replacement semantics, meaning the request representation entirely supersedes the previous mutable state of the resource.",
+      "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    },
+    {
+      "id": "RULE-012",
+      "rule": "Bear data persists only in memory for the lifetime of the process; no durable storage or cross-process replication is provided.",
+      "rationale": "Matches the explicit in-memory store requirement and sets clear durability expectations.",
+      "sourceBlockIds": [
+        "task_84b1038c357e"
+      ]
+    }
+  ]
+}

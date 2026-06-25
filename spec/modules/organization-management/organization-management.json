@@ -1,0 +1,276 @@
+{
+  "name": "Organization Management",
+  "summary": "Capabilities for creating and fully replacing Organization resources with a fixed id/name/slug schema, UUID generation, and slug uniqueness enforced in an in-memory store.",
+  "requirements": [
+    {
+      "id": "REQ-007-2",
+      "title": "Create Organization endpoint",
+      "statement": "The system SHALL expose a REST endpoint that creates an Organization from a supplied name and slug.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-007-AC-01-2",
+          "given": "a creation request containing valid values for name and slug",
+          "when": "the request is processed",
+          "outcome": "a new Organization is persisted with a system-generated UUID as its id, and a success response is returned"
+        },
+        {
+          "id": "REQ-007-AC-02-2",
+          "given": "a creation request that does not include a name",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-007-AC-03-2",
+          "given": "a creation request that does not include a slug",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-007-AC-04-2",
+          "given": "a creation request that includes a slug already held by a persisted Organization",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request to preserve slug uniqueness"
+        },
+        {
+          "id": "REQ-007-AC-05-2",
+          "given": "a creation request that includes a slug not matching the required lowercase-alphanumeric-hyphen format",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-007-AC-06-2",
+          "given": "a creation request that includes extra fields beyond name and slug",
+          "when": "the request is processed",
+          "outcome": "the persisted Organization contains only id, name, and slug; any additional fields are discarded"
+        }
+      ]
+    },
+    {
+      "id": "REQ-008-2",
+      "title": "Replace Organization endpoint",
+      "statement": "The system SHALL expose a REST endpoint that fully replaces an existing persisted Organization with a complete Organization record.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-008-AC-01-2",
+          "given": "an existing Organization and a replace request containing a complete Organization record including id, name, and slug",
+          "when": "the request is processed",
+          "outcome": "the stored Organization is fully replaced with the supplied record, and a success response is returned"
+        },
+        {
+          "id": "REQ-008-AC-02-2",
+          "given": "a replace request referencing an id that does not identify any persisted Organization",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request because the target Organization does not exist"
+        },
+        {
+          "id": "REQ-008-AC-03",
+          "given": "a replace request for an existing Organization where the request body is missing id, name, or slug",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-008-AC-04",
+          "given": "a replace request where the id in the request body does not match the targeted Organization's id",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-008-AC-05",
+          "given": "a replace request for an existing Organization that repeats the Organization's own current slug",
+          "when": "the request is processed",
+          "outcome": "the replacement succeeds and slug uniqueness is maintained"
+        },
+        {
+          "id": "REQ-008-AC-06",
+          "given": "a replace request for an existing Organization that specifies a slug already held by a different Organization",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request to preserve slug uniqueness"
+        },
+        {
+          "id": "REQ-008-AC-07",
+          "given": "a replace request for an existing Organization that includes a slug not matching the required lowercase-alphanumeric-hyphen format",
+          "when": "the request is processed",
+          "outcome": "the system rejects the request as invalid"
+        },
+        {
+          "id": "REQ-008-AC-08",
+          "given": "a replace request for an existing Organization that includes extra fields beyond id, name, and slug",
+          "when": "the request is processed",
+          "outcome": "the persisted Organization contains only id, name, and slug; any additional fields are discarded"
+        }
+      ]
+    },
+    {
+      "id": "REQ-009-2",
+      "title": "Organization UUID identifier generation",
+      "statement": "The system SHALL generate a UUID for the Organization id upon creation and SHALL NOT allow clients to supply or modify it.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-009-AC-01-2",
+          "given": "an Organization creation request",
+          "when": "the system persists the Organization",
+          "outcome": "the id value is a valid, system-generated UUID"
+        },
+        {
+          "id": "REQ-009-AC-02-2",
+          "given": "two independent Organization creation requests",
+          "when": "both Organizations are persisted",
+          "outcome": "each Organization is assigned a distinct id"
+        },
+        {
+          "id": "REQ-009-AC-03",
+          "given": "a creation request that includes a client-supplied id",
+          "when": "the request is processed",
+          "outcome": "the system ignores the supplied id and assigns its own UUID"
+        },
+        {
+          "id": "REQ-009-AC-04",
+          "given": "an existing Organization",
+          "when": "a replace request is processed",
+          "outcome": "the Organization's id remains unchanged from the value assigned at creation"
+        }
+      ]
+    },
+    {
+      "id": "REQ-010-2",
+      "title": "Slug uniqueness",
+      "statement": "The system SHALL enforce that the slug field is unique across all persisted Organizations for both creation and replacement operations.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-010-AC-01-2",
+          "given": "an Organization already exists with a specific slug",
+          "when": "a creation request specifies that same slug",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-010-AC-02-2",
+          "given": "an Organization already exists with a specific slug",
+          "when": "a replace request for a different Organization specifies that same slug",
+          "outcome": "the system rejects the request"
+        },
+        {
+          "id": "REQ-010-AC-03-2",
+          "given": "an Organization already exists with a specific slug",
+          "when": "a replace request for that same Organization repeats the current slug",
+          "outcome": "the replacement succeeds and slug uniqueness is maintained"
+        },
+        {
+          "id": "REQ-010-AC-04-2",
+          "given": "no persisted Organization has a specific slug",
+          "when": "a creation or replace request specifies that slug",
+          "outcome": "the operation succeeds and the new slug is stored"
+        }
+      ]
+    },
+    {
+      "id": "REQ-011-2",
+      "title": "Organization representation",
+      "statement": "The system SHALL represent an Organization with exactly the fields id, name, and slug, and SHALL NOT persist additional fields supplied by clients.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-011-AC-01-2",
+          "given": "any persisted Organization",
+          "when": "the record is inspected",
+          "outcome": "it contains exactly the fields id, name, and slug"
+        },
+        {
+          "id": "REQ-011-AC-02-2",
+          "given": "an Organization has been created or replaced",
+          "when": "the persisted record is retrieved",
+          "outcome": "no extra computed or metadata fields are present beyond id, name, and slug"
+        }
+      ]
+    },
+    {
+      "id": "REQ-012-2",
+      "title": "Organization in-memory persistence",
+      "statement": "The system SHALL use an in-memory store for all Organization persistence.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-012-AC-01-2",
+          "given": "an Organization has been persisted",
+          "when": "the running process serves subsequent requests",
+          "outcome": "the Organization record remains available and can be replaced within the same process instance"
+        },
+        {
+          "id": "REQ-012-AC-02",
+          "given": "an Organization has been persisted",
+          "when": "the process is restarted",
+          "outcome": "the previously persisted Organization records are no longer present"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE-013",
+      "rule": "An Organization id is immutable and is system-assigned as a UUID at creation time.",
+      "rationale": "Guarantees unique identity without requiring client coordination and prevents identity spoofing or alteration.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-014",
+      "rule": "The slug field acts as a unique key across the entire Organization population and must match the lowercase-alphanumeric-hyphen pattern.",
+      "rationale": "Provides a human-readable unique identifier while preventing ambiguous or malformed slugs.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-015",
+      "rule": "Replacement of an Organization is a full-record operation requiring id, name, and slug; partial updates are not permitted.",
+      "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-016",
+      "rule": "An Organization entity has exactly the fields id, name, and slug.",
+      "rationale": "Keeps the domain model minimal and predictable for clients.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    },
+    {
+      "id": "RULE-017",
+      "rule": "Organization data persists only in memory for the lifetime of the process; no durable storage or cross-process replication is provided.",
+      "rationale": "Matches the explicit in-memory store requirement and sets clear durability expectations.",
+      "sourceBlockIds": [
+        "task_58171069de9d"
+      ]
+    }
+  ]
+}

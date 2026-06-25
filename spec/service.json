@@ -1,0 +1,4 @@
+{
+  "service": "in-memory-resource-service",
+  "summary": "A transient, in-memory REST service managing multiple resource collections: Users, Organizations, Buildings, Cars, Bicycles, and Office Tables. Each resource type supports create/get/list/update/delete operations, uses system-generated identifiers, enforces simple per-resource domain validation, and persists only for the lifetime of the process."
+}

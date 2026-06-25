@@ -1,0 +1,310 @@
+{
+  "name": "Office Table Management",
+  "summary": "Capabilities for creating, retrieving, listing, updating, and deleting physical office furniture (office table) resources with UUIDv7 identifiers, non-negative price validation, fixed id/price/date-bought representation, full-replacement updates, direct JSON payloads, cursor-based pagination, and no API version prefixes.",
+  "requirements": [
+    {
+      "id": "REQ-026",
+      "title": "Office Table CRUD endpoints",
+      "statement": "The system SHALL expose REST endpoints for Create, Read, Update, and Delete operations on office table resources; exact URL paths SHALL be determined at implementation time.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-026-AC-01",
+          "given": "the service is running",
+          "when": "its API is inspected",
+          "outcome": "it exposes RESTful endpoints supporting all CRUD operations for office tables"
+        }
+      ]
+    },
+    {
+      "id": "REQ-027",
+      "title": "Office Table representation",
+      "statement": "The system SHALL represent each office table resource with the fields id, price, and date bought, generating id as a UUIDv7 upon creation.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-027-AC-01",
+          "given": "a request to create an office table",
+          "when": "the resource is created",
+          "outcome": "the system assigns a UUIDv7 identifier and stores the provided price and date bought"
+        },
+        {
+          "id": "REQ-027-AC-02",
+          "given": "any stored office table",
+          "when": "retrieved",
+          "outcome": "its JSON representation contains id, price, and date bought"
+        },
+        {
+          "id": "REQ-027-AC-03",
+          "given": "a creation request that includes a client-supplied id",
+          "when": "the request is processed",
+          "outcome": "the system ignores the supplied id and assigns its own UUIDv7 identifier"
+        }
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "title": "Office Table price validation",
+      "statement": "The system SHALL reject any create or update request that specifies a negative price.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-028-AC-01",
+          "given": "a request payload with a negative price",
+          "when": "the create endpoint processes the request",
+          "outcome": "the system returns an HTTP status code consistent with common REST conventions indicating a client validation error and does not persist the invalid resource"
+        },
+        {
+          "id": "REQ-028-AC-02",
+          "given": "a request payload with a negative price for an existing office table",
+          "when": "the update endpoint processes the request",
+          "outcome": "the system returns an HTTP status code consistent with common REST conventions indicating a client validation error and does not persist the invalid resource"
+        },
+        {
+          "id": "REQ-028-AC-03",
+          "given": "a request payload with a zero price",
+          "when": "the create or update endpoint processes the request",
+          "outcome": "the operation succeeds because zero is a non-negative price"
+        }
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "title": "Retrieve Office Table endpoint",
+      "statement": "The system SHALL provide an endpoint to retrieve a single office table by its UUIDv7 identifier.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-029-AC-01",
+          "given": "an existing office table UUIDv7 identifier",
+          "when": "the retrieve endpoint is invoked",
+          "outcome": "the system returns the resource directly as JSON with an HTTP status code consistent with common REST conventions for a successful retrieval"
+        },
+        {
+          "id": "REQ-029-AC-02",
+          "given": "a non-existent UUIDv7 identifier",
+          "when": "the retrieve endpoint is invoked",
+          "outcome": "the system returns an HTTP status code consistent with common REST conventions indicating the resource was not found"
+        }
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "title": "List Office Tables endpoint",
+      "statement": "The system SHALL provide an endpoint to list office tables with cursor-based pagination.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-030-AC-01",
+          "given": "multiple office tables exist in the store",
+          "when": "the list endpoint is invoked",
+          "outcome": "the system returns a paginated collection directly as JSON using cursor-based pagination"
+        }
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "title": "Office Table full replacement update",
+      "statement": "The system SHALL support only full resource replacement for updates.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-031-AC-01",
+          "given": "an existing office table",
+          "when": "an update request is received with a payload",
+          "outcome": "the system replaces all stored fields with the payload contents and returns the updated resource"
+        }
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "title": "Direct JSON payloads",
+      "statement": "The system SHALL return resource and collection payloads directly as JSON without an envelope wrapper, using HTTP status codes consistent with common REST conventions.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-032-AC-01",
+          "given": "any successful CRUD operation for office tables",
+          "when": "the response is returned",
+          "outcome": "the body contains the resource or collection directly without a data envelope"
+        }
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "title": "Office Table in-memory persistence",
+      "statement": "The system SHALL persist office table resources in a fully ephemeral in-memory store that is cleared on service restart.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-033-AC-01",
+          "given": "the service has stored office tables",
+          "when": "the service process restarts",
+          "outcome": "no office table data from the previous process lifecycle remains"
+        }
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "title": "No API version prefixes",
+      "statement": "The system SHALL NOT include API version prefixes in endpoint URLs.",
+      "kind": "functional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-034-AC-01",
+          "given": "any endpoint URL for office tables",
+          "when": "inspected",
+          "outcome": "it does not contain a version path segment such as /v1/"
+        }
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "title": "Office Table REST interface conventions",
+      "statement": "The system SHALL expose a REST interface for office tables following common HTTP and REST conventions.",
+      "kind": "nonfunctional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-035-AC-01",
+          "given": "a valid request to an office table endpoint using the HTTP method associated with the requested operation",
+          "when": "the request is processed",
+          "outcome": "the response uses an HTTP status code consistent with common REST conventions for that operation"
+        },
+        {
+          "id": "REQ-035-AC-02",
+          "given": "a request to an office table endpoint using an HTTP method not supported by that endpoint",
+          "when": "the request is processed",
+          "outcome": "the response uses an HTTP status code consistent with common REST conventions indicating the method is not allowed"
+        },
+        {
+          "id": "REQ-035-AC-03",
+          "given": "an invalid request payload for an office table create or update operation",
+          "when": "the request is processed",
+          "outcome": "the response uses an HTTP status code consistent with common REST conventions indicating a client validation error"
+        }
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "title": "Office Table in-memory response times",
+      "statement": "The system SHALL use an in-memory store with response times characteristic of in-memory data access for all Office Table CRUD operations.",
+      "kind": "nonfunctional",
+      "priority": "must",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ],
+      "acceptance": [
+        {
+          "id": "REQ-036-AC-01",
+          "given": "the in-memory store contains office table data",
+          "when": "any CRUD operation is performed",
+          "outcome": "the operation completes without disk I/O or durable storage access"
+        },
+        {
+          "id": "REQ-036-AC-02",
+          "given": "the service is processing office table requests",
+          "when": "response times are observed",
+          "outcome": "CRUD operations complete within a timeframe characteristic of in-memory data access"
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RULE-025",
+      "rule": "An Office Table id is an immutable UUIDv7 generated by the system at resource creation; client-provided ids are not accepted.",
+      "rationale": "Provides time-ordered, globally unique identifiers while preventing identity spoofing.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-026",
+      "rule": "An Office Table price must be non-negative for every persisted resource.",
+      "rationale": "Prevents invalid financial values for furniture records.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-027",
+      "rule": "An Office Table entity has exactly the fields id, price, and date bought.",
+      "rationale": "Keeps the furniture resource model minimal and predictable for clients.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-028",
+      "rule": "Replacement of an Office Table is a full replacement of all stored fields; partial updates via PATCH are prohibited.",
+      "rationale": "Avoids partial-update ambiguity and keeps the state transfer contract explicit.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-029",
+      "rule": "Office Table data persists only in memory for the lifetime of the process.",
+      "rationale": "Matches the explicit fully ephemeral in-memory store requirement.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-030",
+      "rule": "Office Table endpoint URLs SHALL NOT contain API version path segments.",
+      "rationale": "The product owner specified no API version prefixes.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    },
+    {
+      "id": "RULE-031",
+      "rule": "An office table is a physical furniture item; the data model and business logic apply to furniture, not database tables or abstract entities.",
+      "rationale": "Clarifies the domain scope so that the resource is interpreted as office furniture rather than database tables or other abstract constructs.",
+      "sourceBlockIds": [
+        "task_74f863ac61b8"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-Feature: Building Management
+Feature: Building Management — Building Management
   Capabilities for creating, retrieving, updating, deleting, and listing Building resources with unique identifiers, name and address fields, and cursor-based pagination over a transient in-memory store.
 
   @must

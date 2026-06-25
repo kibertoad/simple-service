@@ -1,4 +1,4 @@
-Feature: Bear CRUD
+Feature: Bear CRUD — Bear CRUD
   Capabilities for creating, reading, listing, updating, and deleting Bear resources with id/name/age/colour schema, UUIDv7 generation, validation rules for name and age, freeform colour, and cursor-based pagination backed by in-memory storage.
 
   @must
